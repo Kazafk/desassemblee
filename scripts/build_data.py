@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 COMPUTED = ROOT / "data" / "processed" / "scores_computed.json"
-OUT_DIR = ROOT / "web" / "data"
+OUT_DIR = ROOT / "docs" / "data"
 OUT = OUT_DIR / "scores.json"
 
 # Métadonnées statiques par slug canonique
