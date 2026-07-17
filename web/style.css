@@ -1,0 +1,339 @@
+/* ============================================================
+   DÉSASSEMBLÉE — Style "grand journal"
+   ============================================================ */
+
+:root {
+  --bg:          #FAFAF7;
+  --ink:         #1A1A1A;
+  --ink-light:   #5A5A5A;
+  --rule:        #CCBBA0;
+  --rule-light:  #E8E0D4;
+  --accent:      #8B0B00;
+  --font-serif:  'Playfair Display', Georgia, serif;
+  --font-body:   'Source Serif 4', Georgia, serif;
+  --font-mono:   'JetBrains Mono', 'Courier New', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Mise en page ──────────────────────────────────── */
+
+.page-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ── Masthead ──────────────────────────────────────── */
+
+.masthead {
+  text-align: center;
+  padding: 2.5rem 0 1.5rem;
+}
+
+.masthead-rule {
+  height: 3px;
+  background: var(--ink);
+  border: none;
+}
+
+.masthead-rule.bottom {
+  height: 1px;
+  margin-top: 1.25rem;
+}
+
+.masthead-inner {
+  padding: 1.25rem 0 0;
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 0.5rem;
+}
+
+h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--ink-light);
+  margin-top: 0.6rem;
+}
+
+/* ── Chart section ─────────────────────────────────── */
+
+.chart-section {
+  margin: 2rem 0 1.5rem;
+}
+
+.chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.btn-toggle-all {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-light);
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-toggle-all:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.chart-hint {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--ink-light);
+  opacity: 0.7;
+}
+
+.chart-container {
+  width: 100%;
+  background: var(--bg);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.chart-container svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Axes D3 */
+.axis text {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  fill: var(--ink-light);
+}
+
+.axis line, .axis path {
+  stroke: var(--rule-light);
+}
+
+.axis-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  fill: var(--ink-light);
+  letter-spacing: 0.05em;
+}
+
+.zero-line {
+  stroke: var(--rule);
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+}
+
+.election-line {
+  stroke: var(--rule);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.election-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  fill: var(--ink-light);
+}
+
+/* Party lines */
+.party-line {
+  fill: none;
+  stroke-width: 2.2;
+  transition: opacity 0.2s, stroke-width 0.2s;
+  cursor: pointer;
+}
+
+.party-line.dimmed {
+  opacity: 0.08;
+}
+
+.party-line.highlighted {
+  stroke-width: 3.2;
+}
+
+.party-dot {
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.party-dot.dimmed {
+  opacity: 0.08;
+}
+
+/* ── Légende ───────────────────────────────────────── */
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-top: 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--rule-light);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  user-select: none;
+}
+
+.legend-item.dimmed { opacity: 0.35; }
+
+.legend-swatch {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legend-name {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink);
+}
+
+/* ── Tooltip ───────────────────────────────────────── */
+
+.tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 0.6rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.6;
+  max-width: 220px;
+  opacity: 0;
+  transition: opacity 0.12s;
+  z-index: 1000;
+  border-left: 3px solid var(--accent);
+}
+
+.tooltip.visible { opacity: 1; }
+
+.tooltip-party { font-weight: 500; font-size: 0.78rem; }
+.tooltip-score { font-size: 0.9rem; }
+.tooltip-meta  { opacity: 0.65; font-size: 0.65rem; }
+
+/* ── Méthodologie ──────────────────────────────────── */
+
+.methodology {
+  margin: 1.5rem 0 2rem;
+  border-top: 1px solid var(--rule-light);
+  padding-top: 1rem;
+}
+
+.methodology details summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  padding: 0.4rem 0;
+}
+
+.methodology details summary::-webkit-details-marker { display: none; }
+.method-icon { color: var(--accent); }
+
+.method-body {
+  padding: 1rem 0 0 1.5rem;
+  max-width: 680px;
+  font-size: 0.9rem;
+  color: var(--ink-light);
+}
+
+.method-body p + p { margin-top: 0.75rem; }
+
+.method-body a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.legend-sources {
+  list-style: none;
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.dot { margin-right: 0.25rem; }
+.dot.ches  { color: var(--ink); }
+.dot.pca   { color: var(--ink); }
+.dot.interp { color: var(--ink-light); }
+
+/* ── Footer ────────────────────────────────────────── */
+
+footer { padding: 1rem 0 2rem; }
+
+.footer-rule {
+  height: 1px;
+  background: var(--rule);
+  margin-bottom: 0.75rem;
+}
+
+.footer-text {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--ink-light);
+}
+
+.footer-text a {
+  color: var(--ink-light);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Responsive ────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .page-wrapper { padding: 0 1rem; }
+  .chart-hint { display: none; }
+  .method-body { padding-left: 0; }
+}

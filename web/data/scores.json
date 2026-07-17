@@ -1,0 +1,306 @@
+{
+  "meta": {
+    "updated": "2026-07-17",
+    "sources": [
+      "API CLAIR — votes AN (session 17)",
+      "Chapel Hill Expert Survey 2023"
+    ],
+    "method": "ACP sur votes parlementaires AN, calibrée sur CHES (lrgen)",
+    "scale": "[-10, +10] — gauche (négatif) à droite (positif)",
+    "note": "Données de démonstration session 17 (2024-2026). Lancez les scripts pour les données complètes 2012-2026."
+  },
+  "parties": [
+    {
+      "slug": "lfi",
+      "name": "La France insoumise",
+      "name_short": "LFI",
+      "color": "#BE0000",
+      "family": "gauche_radicale",
+      "scores": [
+        {
+          "year": 2024,
+          "score": -4.8,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2025,
+          "score": -5.1,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2026,
+          "score": -4.9,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        }
+      ]
+    },
+    {
+      "slug": "gdr",
+      "name": "Gauche Démocrate et Républicaine",
+      "name_short": "GDR/PCF",
+      "color": "#8B0000",
+      "family": "gauche_radicale",
+      "scores": [
+        {
+          "year": 2024,
+          "score": -4.9,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2025,
+          "score": -5.0,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2026,
+          "score": -5.1,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        }
+      ]
+    },
+    {
+      "slug": "ps",
+      "name": "Parti Socialiste",
+      "name_short": "PS",
+      "color": "#E91E8C",
+      "family": "gauche",
+      "scores": [
+        {
+          "year": 2024,
+          "score": -4.2,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2025,
+          "score": -4.3,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2026,
+          "score": -4.2,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        }
+      ]
+    },
+    {
+      "slug": "eelv",
+      "name": "Les Écologistes",
+      "name_short": "EELV",
+      "color": "#00A550",
+      "family": "gauche",
+      "scores": [
+        {
+          "year": 2024,
+          "score": -4.5,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2025,
+          "score": -4.6,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2026,
+          "score": -4.5,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        }
+      ]
+    },
+    {
+      "slug": "liot",
+      "name": "LIOT",
+      "name_short": "LIOT",
+      "color": "#78909C",
+      "family": "centre",
+      "scores": [
+        {
+          "year": 2024,
+          "score": -0.3,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2025,
+          "score": -0.5,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2026,
+          "score": -0.4,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        }
+      ]
+    },
+    {
+      "slug": "modem",
+      "name": "Mouvement Démocrate",
+      "name_short": "MoDem",
+      "color": "#FF8C00",
+      "family": "centre",
+      "scores": [
+        {
+          "year": 2024,
+          "score": 1.2,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2025,
+          "score": 1.8,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2026,
+          "score": 1.5,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        }
+      ]
+    },
+    {
+      "slug": "renaissance",
+      "name": "Renaissance",
+      "name_short": "Renaissance",
+      "color": "#FF6D00",
+      "family": "centre",
+      "scores": [
+        {
+          "year": 2024,
+          "score": 2.1,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2025,
+          "score": 2.5,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2026,
+          "score": 2.3,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        }
+      ]
+    },
+    {
+      "slug": "horizons",
+      "name": "Horizons",
+      "name_short": "Horizons",
+      "color": "#0288D1",
+      "family": "centre_droit",
+      "scores": [
+        {
+          "year": 2024,
+          "score": 3.5,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2025,
+          "score": 3.2,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2026,
+          "score": 3.4,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        }
+      ]
+    },
+    {
+      "slug": "lr",
+      "name": "Les Républicains",
+      "name_short": "LR/UMP",
+      "color": "#1565C0",
+      "family": "droite",
+      "scores": [
+        {
+          "year": 2024,
+          "score": 4.8,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2025,
+          "score": 4.5,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2026,
+          "score": 4.7,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        }
+      ]
+    },
+    {
+      "slug": "rn",
+      "name": "Rassemblement National",
+      "name_short": "RN",
+      "color": "#1A237E",
+      "family": "droite_radicale",
+      "scores": [
+        {
+          "year": 2024,
+          "score": 5.4,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2025,
+          "score": 4.9,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        },
+        {
+          "year": 2026,
+          "score": 5.2,
+          "source": "pca_calibrated",
+          "r2": 0.92
+        }
+      ]
+    }
+  ],
+  "elections": [
+    {
+      "year": 2012,
+      "label": "Législatives 2012",
+      "note": "Victoire PS"
+    },
+    {
+      "year": 2017,
+      "label": "Législatives 2017",
+      "note": "Victoire LREM"
+    },
+    {
+      "year": 2022,
+      "label": "Législatives 2022",
+      "note": "NUPES / Ensemble"
+    },
+    {
+      "year": 2024,
+      "label": "Législatives 2024",
+      "note": "NFP en tête"
+    }
+  ]
+}

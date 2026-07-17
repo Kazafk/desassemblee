@@ -1,0 +1,51 @@
+{
+  "_comment": "Mapping des slugs de groupes API CLAIR vers les slugs canoniques du projet. Maintenir à chaque nouvelle législature.",
+  "session_14": {
+    "SRC":    { "canonical": "ps",           "ches_name": "PS",   "name": "Socialistes, Républicains et Citoyens" },
+    "UMP":    { "canonical": "lr",           "ches_name": "UMP",  "name": "Union pour un Mouvement Populaire" },
+    "GDR":    { "canonical": "gdr",          "ches_name": "PCF",  "name": "Gauche Démocrate et Républicaine" },
+    "EAP":    { "canonical": "eelv",         "ches_name": "EELV", "name": "Écologiste" },
+    "RRDP":   { "canonical": "prg",          "ches_name": null,   "name": "Radical, Républicain, Démocrate et Progressiste" },
+    "UDI":    { "canonical": "udi",          "ches_name": "UDI",  "name": "Union des Démocrates et Indépendants" },
+    "NI":     { "canonical": null,           "ches_name": null,   "name": "Non inscrits" }
+  },
+  "session_15": {
+    "LaREM":  { "canonical": "renaissance",  "ches_name": "LREM", "name": "La République En Marche" },
+    "FI":     { "canonical": "lfi",          "ches_name": "LFI",  "name": "La France Insoumise" },
+    "SOC":    { "canonical": "ps",           "ches_name": "PS",   "name": "Socialistes et apparentés" },
+    "LR":     { "canonical": "lr",           "ches_name": "LR",   "name": "Les Républicains" },
+    "RN":     { "canonical": "rn",           "ches_name": "RN",   "name": "Rassemblement National" },
+    "DEM":    { "canonical": "modem",        "ches_name": "MoDem","name": "Démocrate (MoDem et Indépendants)" },
+    "UDI":    { "canonical": "udi",          "ches_name": "UDI",  "name": "UDI et Indépendants" },
+    "LT":     { "canonical": "horizons",     "ches_name": null,   "name": "Libertés et Territoires" },
+    "GDR":    { "canonical": "gdr",          "ches_name": "PCF",  "name": "Gauche Démocrate et Républicaine" },
+    "NI":     { "canonical": null,           "ches_name": null,   "name": "Non inscrits" }
+  },
+  "session_16": {
+    "RN":     { "canonical": "rn",           "ches_name": "RN",   "name": "Rassemblement National" },
+    "LFI-NUPES": { "canonical": "lfi",       "ches_name": "LFI",  "name": "La France Insoumise - NUPES" },
+    "REN":    { "canonical": "renaissance",  "ches_name": "REN",  "name": "Renaissance" },
+    "DEM":    { "canonical": "modem",        "ches_name": "MoDem","name": "Démocrate (MoDem et Indépendants)" },
+    "HOR":    { "canonical": "horizons",     "ches_name": "HOR",  "name": "Horizons et apparentés" },
+    "LR":     { "canonical": "lr",           "ches_name": "LR",   "name": "Les Républicains" },
+    "SOC":    { "canonical": "ps",           "ches_name": "PS",   "name": "Socialistes et apparentés" },
+    "ECO":    { "canonical": "eelv",         "ches_name": "EELV", "name": "Écologistes - NUPES" },
+    "GDR":    { "canonical": "gdr",          "ches_name": "PCF",  "name": "Gauche Démocrate et Républicaine" },
+    "LIOT":   { "canonical": "liot",         "ches_name": null,   "name": "LIOT" },
+    "NI":     { "canonical": null,           "ches_name": null,   "name": "Non inscrits" }
+  },
+  "session_17": {
+    "RN":     { "canonical": "rn",           "ches_name": "RN",   "name": "Rassemblement National" },
+    "NFP":    { "canonical": "lfi",          "ches_name": "LFI",  "name": "Nouveau Front Populaire - LFI" },
+    "LFI-NFP": { "canonical": "lfi",         "ches_name": "LFI",  "name": "LFI - NFP" },
+    "SOC":    { "canonical": "ps",           "ches_name": "PS",   "name": "Socialistes et apparentés" },
+    "ECOS":   { "canonical": "eelv",         "ches_name": "EELV", "name": "Écologistes" },
+    "GDR":    { "canonical": "gdr",          "ches_name": "PCF",  "name": "Gauche Démocrate et Républicaine" },
+    "EPR":    { "canonical": "renaissance",  "ches_name": "REN",  "name": "Ensemble pour la République" },
+    "DEM":    { "canonical": "modem",        "ches_name": "MoDem","name": "Démocrate (MoDem et Indépendants)" },
+    "HOR":    { "canonical": "horizons",     "ches_name": "HOR",  "name": "Horizons et apparentés" },
+    "LR":     { "canonical": "lr",           "ches_name": "LR",   "name": "Les Républicains" },
+    "LIOT":   { "canonical": "liot",         "ches_name": null,   "name": "LIOT" },
+    "NI":     { "canonical": null,           "ches_name": null,   "name": "Non inscrits" }
+  }
+}

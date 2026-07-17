@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Désassemblée — Positionnement politique 2012–présent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="page-wrapper">
+
+    <header class="masthead">
+      <div class="masthead-rule top"></div>
+      <div class="masthead-inner">
+        <p class="section-label">Analyse politique · France · 2012–présent</p>
+        <h1>La Désassemblée</h1>
+        <p class="subtitle">Évolution du positionnement gauche&thinsp;–&thinsp;droite des partis français<br>
+          mesuré par l'analyse des votes à l'Assemblée nationale</p>
+      </div>
+      <div class="masthead-rule bottom"></div>
+    </header>
+
+    <main>
+
+      <section class="chart-section">
+        <div class="chart-controls">
+          <button class="btn-toggle-all" id="toggleAll">Tout afficher</button>
+          <span class="chart-hint">Cliquez sur un parti pour le mettre en valeur</span>
+        </div>
+        <div class="chart-container" id="chart"></div>
+        <div class="chart-legend" id="legend"></div>
+      </section>
+
+      <section class="methodology">
+        <details>
+          <summary>
+            <span class="method-icon">◉</span>
+            Méthodologie
+          </summary>
+          <div class="method-body">
+            <p><strong>Comment ce score est-il calculé ?</strong> À partir des votes à l'Assemblée nationale (sessions 14 à 17), on construit une matrice de votes <em>(groupes&thinsp;×&thinsp;scrutins)</em> encodant +1&thinsp;(pour), −1&thinsp;(contre), 0&thinsp;(abstention). Une analyse en composantes principales (ACP) en extrait le premier axe, qui capture empiriquement le clivage gauche-droite.</p>
+            <p>Les scores sont <strong>calibrés sur le Chapel Hill Expert Survey</strong> (CHES, chesdata.eu) — une enquête académique bisannuelle où des chercheurs en science politique notent les partis sur un axe 0–10. Cette calibration ancre l'ACP sur une référence indépendante de toute auto-déclaration partisane.</p>
+            <p><strong>Sources :</strong> <a href="https://api.clair.vote" target="_blank">API CLAIR</a> (votes AN) · <a href="https://chesdata.eu" target="_blank">Chapel Hill Expert Survey 2023</a></p>
+            <ul class="legend-sources">
+              <li><span class="dot ches">◆</span> Ancre CHES (enquête académique)</li>
+              <li><span class="dot pca">●</span> Score ACP calibré (votes réels)</li>
+              <li><span class="dot interp">○</span> Score interpolé</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+    </main>
+
+    <footer>
+      <div class="footer-rule"></div>
+      <p class="footer-text">
+        <span id="updateDate"></span>
+        &ensp;·&ensp;
+        Données : <a href="https://api.clair.vote" target="_blank">API CLAIR</a> &amp; <a href="https://chesdata.eu" target="_blank">CHES 2023</a>
+        &ensp;·&ensp;
+        Code : <a href="https://github.com/Kazafk/desassemblee" target="_blank">github.com/Kazafk/desassemblee</a>
+      </p>
+    </footer>
+
+  </div>
+
+  <div id="tooltip" class="tooltip" role="tooltip" aria-hidden="true"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
