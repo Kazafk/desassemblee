@@ -1,7 +1,15 @@
 data/raw/clair/
+data/raw/ches/
 __pycache__/
 *.pyc
 .env
 *.egg-info/
 .venv/
 venv/
+
+# Fichiers Manifesto Project (exploration initiale, non utilisés)
+*_MPDataset_*.csv
+*_MPDataset_*.pdf
+*_Partylist_*.pdf
+handbooks.htm
+release_notes_*.pdf

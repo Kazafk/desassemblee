@@ -1,0 +1,226 @@
+[
+  {
+    "ches_name": "AC",
+    "canonical": null,
+    "year": 2014,
+    "lrgen_raw": 6.6,
+    "score": 3.2
+  },
+  {
+    "ches_name": "EELV",
+    "canonical": "eelv",
+    "year": 2014,
+    "lrgen_raw": 3.083,
+    "score": -3.833
+  },
+  {
+    "ches_name": "Ensemble",
+    "canonical": null,
+    "year": 2014,
+    "lrgen_raw": 2.5,
+    "score": -5.0
+  },
+  {
+    "ches_name": "FN",
+    "canonical": "rn",
+    "year": 2014,
+    "lrgen_raw": 9.636,
+    "score": 9.273
+  },
+  {
+    "ches_name": "MODEM",
+    "canonical": "modem",
+    "year": 2014,
+    "lrgen_raw": 5.909,
+    "score": 1.818
+  },
+  {
+    "ches_name": "MPF",
+    "canonical": null,
+    "year": 2014,
+    "lrgen_raw": 9.1,
+    "score": 8.2
+  },
+  {
+    "ches_name": "NC",
+    "canonical": null,
+    "year": 2014,
+    "lrgen_raw": 6.273,
+    "score": 2.545
+  },
+  {
+    "ches_name": "PCF",
+    "canonical": "gdr",
+    "year": 2014,
+    "lrgen_raw": 1.75,
+    "score": -6.5
+  },
+  {
+    "ches_name": "PG",
+    "canonical": "lfi",
+    "year": 2014,
+    "lrgen_raw": 1.7,
+    "score": -6.6
+  },
+  {
+    "ches_name": "PRG",
+    "canonical": "prg",
+    "year": 2014,
+    "lrgen_raw": 3.818,
+    "score": -2.364
+  },
+  {
+    "ches_name": "PRV",
+    "canonical": null,
+    "year": 2014,
+    "lrgen_raw": 6.143,
+    "score": 2.286
+  },
+  {
+    "ches_name": "PS",
+    "canonical": "ps",
+    "year": 2014,
+    "lrgen_raw": 3.833,
+    "score": -2.333
+  },
+  {
+    "ches_name": "UMP",
+    "canonical": "lr",
+    "year": 2014,
+    "lrgen_raw": 7.667,
+    "score": 5.333
+  },
+  {
+    "ches_name": "DLF",
+    "canonical": null,
+    "year": 2019,
+    "lrgen_raw": 9.0,
+    "score": 8.0
+  },
+  {
+    "ches_name": "EELV",
+    "canonical": "eelv",
+    "year": 2019,
+    "lrgen_raw": 2.5,
+    "score": -5.0
+  },
+  {
+    "ches_name": "FI",
+    "canonical": "lfi",
+    "year": 2019,
+    "lrgen_raw": 1.25,
+    "score": -7.5
+  },
+  {
+    "ches_name": "LR",
+    "canonical": "lr",
+    "year": 2019,
+    "lrgen_raw": 7.875,
+    "score": 5.75
+  },
+  {
+    "ches_name": "LREM",
+    "canonical": "renaissance",
+    "year": 2019,
+    "lrgen_raw": 6.333,
+    "score": 2.667
+  },
+  {
+    "ches_name": "MoDem",
+    "canonical": "modem",
+    "year": 2019,
+    "lrgen_raw": 6.125,
+    "score": 2.25
+  },
+  {
+    "ches_name": "PCF",
+    "canonical": "gdr",
+    "year": 2019,
+    "lrgen_raw": 1.125,
+    "score": -7.75
+  },
+  {
+    "ches_name": "PS",
+    "canonical": "ps",
+    "year": 2019,
+    "lrgen_raw": 3.0,
+    "score": -4.0
+  },
+  {
+    "ches_name": "RN",
+    "canonical": "rn",
+    "year": 2019,
+    "lrgen_raw": 9.75,
+    "score": 9.5
+  },
+  {
+    "ches_name": "FI",
+    "canonical": "lfi",
+    "year": 2024,
+    "lrgen_raw": 0.818,
+    "score": -8.364
+  },
+  {
+    "ches_name": "Horizons",
+    "canonical": "horizons",
+    "year": 2024,
+    "lrgen_raw": 6.6,
+    "score": 3.2
+  },
+  {
+    "ches_name": "LE/EELV",
+    "canonical": "eelv",
+    "year": 2024,
+    "lrgen_raw": 2.3,
+    "score": -5.4
+  },
+  {
+    "ches_name": "LR",
+    "canonical": "lr",
+    "year": 2024,
+    "lrgen_raw": 7.727,
+    "score": 5.455
+  },
+  {
+    "ches_name": "MoDem",
+    "canonical": "modem",
+    "year": 2024,
+    "lrgen_raw": 5.364,
+    "score": 0.727
+  },
+  {
+    "ches_name": "PCF",
+    "canonical": "gdr",
+    "year": 2024,
+    "lrgen_raw": 1.727,
+    "score": -6.545
+  },
+  {
+    "ches_name": "PS",
+    "canonical": "ps",
+    "year": 2024,
+    "lrgen_raw": 3.455,
+    "score": -3.091
+  },
+  {
+    "ches_name": "RE",
+    "canonical": "renaissance",
+    "year": 2024,
+    "lrgen_raw": 6.273,
+    "score": 2.545
+  },
+  {
+    "ches_name": "REC",
+    "canonical": null,
+    "year": 2024,
+    "lrgen_raw": 9.727,
+    "score": 9.455
+  },
+  {
+    "ches_name": "RN",
+    "canonical": "rn",
+    "year": 2024,
+    "lrgen_raw": 8.818,
+    "score": 7.636
+  }
+]

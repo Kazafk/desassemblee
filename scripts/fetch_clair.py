@@ -18,12 +18,19 @@ Stratégie :
 - Re-fetch incrémental : seulement les nouveaux scrutins (numero > max connu)
 """
 import json
+import sys
 import time
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
 import requests
+
+# Force UTF-8 sur stdout/stderr (Windows cp1252 sinon)
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = Path(__file__).parent.parent
 CACHE_DIR = ROOT / "data" / "raw" / "clair"
@@ -114,7 +121,7 @@ def fetch_all_scrutins() -> list[dict]:
         return existing
 
     new_count = latest_numero - max_numero
-    print(f"  {new_count} nouveaux scrutins à télécharger (n°{max_numero+1} → n°{latest_numero})")
+    print(f"  {new_count} nouveaux scrutins a telecharger (n.{max_numero+1} -> n.{latest_numero})")
 
     # Collecter les nouveaux scrutins
     new_scrutins = [s for s in items_p1 if s["numero"] > max_numero]
@@ -144,7 +151,7 @@ def fetch_all_scrutins() -> list[dict]:
 
         page += 1
         if page % 10 == 0:
-            print(f"  Page {page} (n°{items[-1]['numero']} → {items[0]['numero']})...")
+            print(f"  Page {page} (n.{items[-1]['numero']} -> {items[0]['numero']})...")
 
     all_scrutins = existing + new_scrutins
     # Trier par numero croissant

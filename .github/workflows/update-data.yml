@@ -47,6 +47,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "data: mise à jour scores politiques [${{ github.event.schedule || 'manuel' }}]"
-          file_pattern: web/data/scores.json data/processed/scores_computed.json
+          file_pattern: docs/data/scores.json data/processed/scores_computed.json
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
