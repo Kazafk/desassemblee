@@ -127,6 +127,38 @@ h1 {
   color: var(--bg);
 }
 
+.mode-selector.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.family-filter {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.family-btn {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px dashed var(--rule);
+  color: var(--ink-light);
+  padding: 0.28rem 0.6rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.family-btn:hover { color: var(--ink); border-color: var(--ink); }
+
+.family-btn.active {
+  border-style: solid;
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--rule-light);
+}
+
 .mode-description {
   font-family: var(--font-body);
   font-style: italic;

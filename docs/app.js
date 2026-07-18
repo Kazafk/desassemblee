@@ -11,11 +11,22 @@ let activeParties = new Set();   // slugs visibles
 let highlightedParty = null;     // slug mis en valeur par hover légende
 let cachedData = null;           // données chargées une seule fois
 let displayMode = "hybride";     // "hybride" | "votes" | "ches"
+let displayScope = "tous";       // "tous" | "solennels"
+let firstRender = true;          // n'animer le tracé qu'au premier chargement
 
 const MODE_DESCRIPTIONS = {
   hybride: "La courbe suit le comportement de vote ; les losanges ◆ marquent l'évaluation des experts (CHES). L'écart entre les deux mesure la distance entre discours et pratique parlementaire.",
   votes:   "Positionnement mesuré uniquement par les votes à l'Assemblée nationale (ACP calibrée). Reflète la pratique, pas la communication.",
   ches:    "Positionnement évalué par les chercheurs du Chapel Hill Expert Survey (vagues 2014, 2019, 2024). Reflète le programme et le discours.",
+};
+
+const SCOPE_NOTE = " Périmètre restreint aux scrutins solennels (textes majeurs, motions de censure) : ~2 % des votes, forte salience médiatique — l'incertitude est plus large.";
+
+// Blocs politiques pour le filtre rapide (champ family de scores.json)
+const FAMILY_BLOCS = {
+  gauche: ["gauche_radicale", "gauche", "centre_gauche"],
+  centre: ["centre", "centre_droit"],
+  droite: ["droite", "droite_radicale"],
 };
 
 async function main() {
@@ -45,6 +56,8 @@ async function main() {
   renderLegend(data);
   setupToggleAll(data);
   setupModeSelector(data);
+  setupScopeSelector(data);
+  setupFamilyFilter(data);
 }
 
 // ── Rendu du graphique ──────────────────────────────────────────
@@ -201,7 +214,8 @@ function renderChart(data) {
   // ── Rendu des courbes par parti (selon le mode d'affichage)
   data.parties.forEach(party => {
     const sorted = [...party.scores].sort((a, b) => a.year - b.year);
-    const pcaSeries  = sorted.filter(d => d.source.startsWith("pca"));
+    const pcaSeries  = sorted.filter(d =>
+      d.source.startsWith("pca") && (d.scope || "tous") === displayScope);
     const chesSeries = sorted.filter(d => d.source === "ches_anchor");
     const visible = activeParties.has(party.slug);
 
@@ -232,7 +246,7 @@ function renderChart(data) {
 
       if (displayMode === "ches") {
         path.attr("stroke-dasharray", "6 4").attr("stroke-width", 1.6);
-      } else {
+      } else if (firstRender) {
         animateLine(path);
       }
     }
@@ -266,16 +280,28 @@ function renderChart(data) {
       });
     }
   });
+
+  firstRender = false;
 }
 
-// ── Sélecteur de mode (Hybride / Votes / Experts) ───────────────
+// ── Sélecteurs de mode et de périmètre ───────────────────────────
+
+function updateDescription() {
+  const description = document.getElementById("modeDescription");
+  let text = MODE_DESCRIPTIONS[displayMode];
+  if (displayScope === "solennels" && displayMode !== "ches") text += SCOPE_NOTE;
+  description.textContent = text;
+
+  // Le périmètre n'a pas de sens en mode Experts (données CHES, pas votes)
+  const scopeSel = document.getElementById("scopeSelector");
+  if (scopeSel) scopeSel.classList.toggle("disabled", displayMode === "ches");
+}
 
 function setupModeSelector(data) {
   const container = document.getElementById("modeSelector");
-  const description = document.getElementById("modeDescription");
   if (!container) return;
 
-  description.textContent = MODE_DESCRIPTIONS[displayMode];
+  updateDescription();
 
   container.querySelectorAll(".mode-btn").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.mode === displayMode);
@@ -287,8 +313,57 @@ function setupModeSelector(data) {
         b.classList.toggle("active", b === btn);
         b.setAttribute("aria-selected", String(b === btn));
       });
-      description.textContent = MODE_DESCRIPTIONS[displayMode];
+      updateDescription();
       renderChart(data);
+    });
+  });
+}
+
+function setupScopeSelector(data) {
+  const container = document.getElementById("scopeSelector");
+  if (!container) return;
+
+  container.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.scope === displayScope);
+    btn.setAttribute("aria-selected", String(btn.dataset.scope === displayScope));
+    btn.addEventListener("click", () => {
+      if (btn.dataset.scope === displayScope) return;
+      displayScope = btn.dataset.scope;
+      container.querySelectorAll(".mode-btn").forEach(b => {
+        b.classList.toggle("active", b === btn);
+        b.setAttribute("aria-selected", String(b === btn));
+      });
+      updateDescription();
+      renderChart(data);
+    });
+  });
+}
+
+// ── Filtre rapide par bloc politique ─────────────────────────────
+
+function clearFamilyButtons() {
+  document.querySelectorAll(".family-btn").forEach(b => b.classList.remove("active"));
+}
+
+function setupFamilyFilter(data) {
+  const container = document.getElementById("familyFilter");
+  if (!container) return;
+
+  container.querySelectorAll(".family-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const wasActive = btn.classList.contains("active");
+      clearFamilyButtons();
+      if (wasActive) {
+        // Re-clic sur le bloc actif : retour à l'affichage complet
+        activeParties = new Set(data.parties.map(p => p.slug));
+      } else {
+        btn.classList.add("active");
+        const families = FAMILY_BLOCS[btn.dataset.bloc] || [];
+        activeParties = new Set(
+          data.parties.filter(p => families.includes(p.family)).map(p => p.slug)
+        );
+      }
+      applyVisibility(data);
     });
   });
 }
@@ -344,6 +419,7 @@ function toggleParty(slug, data) {
   } else {
     activeParties.add(slug);
   }
+  clearFamilyButtons();  // la sélection manuelle invalide le filtre de bloc
   applyVisibility(data);
 }
 
@@ -375,6 +451,7 @@ function setupToggleAll(data) {
     } else {
       data.parties.forEach(p => activeParties.add(p.slug));
     }
+    clearFamilyButtons();
     applyVisibility(data);
   });
 }

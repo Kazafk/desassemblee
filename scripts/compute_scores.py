@@ -28,37 +28,49 @@ OUT = ROOT / "data" / "processed" / "scores_computed.json"
 # Nombre de rééchantillonnages bootstrap pour les intervalles de confiance
 N_BOOTSTRAP = 200
 
-# Tolérance de dépassement d'échelle : un score projeté dans [-11, +11] est
-# clippé à [-10, +10] (bruit de calibration) ; au-delà, le point est EXCLU —
-# l'extrapolation est sortie du domaine où la régression est valide
-# (ex. UDI 2012 sans ancre CHES, projeté très au-delà de +10).
-CLIP_TOLERANCE = 1.0
+# Un score projeté au-delà de ±10 est EXCLU : l'échelle CHES s'arrête à ±10
+# et aucune ancre ne dépasse ±9.6 — toute projection hors de [-10, +10] est
+# une extrapolation au-delà du domaine où la régression est valide
+# (ex. UDI 2012-2016, sans ancre CHES, projeté à +10 et plus).
+CLIP_TOLERANCE = 0.0
+
+# Codes AN des scrutins "solennels" (haute salience politique) :
+# scrutin public solennel, motion de censure, scrutin à la tribune, congrès.
+# Par opposition à SPO (scrutin public ordinaire : amendements de routine).
+SOLENNEL_CODES = {"SPS", "MOC", "SAT", "SSG"}
+
+# Seuil annuel plus bas pour le scope solennel : ~15-30 scrutins/an seulement
+MIN_SCRUTINS_YEAR = {"tous": 10, "solennels": 8}
 
 
-def load_vote_matrix(session: str) -> tuple[list[str], list[str], np.ndarray]:
+def load_vote_matrix(session: str) -> tuple[list[str], list[str], np.ndarray, dict[str, str]]:
     """
-    Retourne (groupe_slugs, scrutin_keys, matrix_np)
+    Retourne (groupe_slugs, scrutin_keys, matrix_np, types)
     matrix_np shape : (n_groupes, n_scrutins), valeurs +1/-1/0
+    types : {"numero|date": codeTypeVote} (vide si sidecar absent)
     """
     path = CACHE_DIR / f"session_{session}_vote_matrix.json"
     if not path.exists():
-        return [], [], np.array([])
+        return [], [], np.array([]), {}
 
     raw = json.loads(path.read_text(encoding="utf-8"))
     if not raw:
-        return [], [], np.array([])
+        return [], [], np.array([]), {}
 
     groupes = sorted(raw.keys())
     scrutins = sorted(set(k for v in raw.values() for k in v.keys()))
     if not scrutins:
-        return [], [], np.array([])
+        return [], [], np.array([]), {}
 
     mat = np.zeros((len(groupes), len(scrutins)), dtype=np.float32)
     for i, g in enumerate(groupes):
         for j, s in enumerate(scrutins):
             mat[i, j] = raw[g].get(s, np.nan)
 
-    return groupes, scrutins, mat
+    types_path = CACHE_DIR / f"session_{session}_scrutin_types.json"
+    types = json.loads(types_path.read_text(encoding="utf-8")) if types_path.exists() else {}
+
+    return groupes, scrutins, mat, types
 
 
 def pca_scores(mat: np.ndarray, groupes: list[str], verbose: bool = True) -> dict[str, list[float]]:
@@ -277,18 +289,22 @@ def compute_session_scores(
     mat: np.ndarray,
     ches_data: list[dict],
     mapping: dict,
+    scope: str = "tous",
+    include_ches: bool = True,
 ) -> dict[str, list[dict]]:
     """
-    Retourne {canonical_slug: [{year, score, source}]}
+    Retourne {canonical_slug: [{year, score, source, scope}]}
+    scope : "tous" (tous les scrutins) ou "solennels" (SPS/MOC/SAT/SSG seuls).
+    include_ches : n'ajouter les ancres CHES qu'une fois (passe "tous").
     """
     if mat.size == 0:
-        print(f"  Session {session} : matrice vide, skip")
+        print(f"  Session {session} [{scope}] : matrice vide, skip")
         return {}
 
     api_to_canonical = slugs_for_session(session, mapping)
     ches_anchor = get_ches_scores_for_session(ches_data, session, mapping)
 
-    print(f"\n  === Session {session} (matrice {mat.shape[0]}×{mat.shape[1]}) ===")
+    print(f"\n  === Session {session} [{scope}] (matrice {mat.shape[0]}×{mat.shape[1]}) ===")
 
     # Score global de session (sur tous les scrutins)
     raw_global = pca_scores(mat, groupes)
@@ -311,18 +327,20 @@ def compute_session_scores(
     year_start, year_end = SESSION_YEARS[session]
     results: dict[str, list[dict]] = defaultdict(list)
 
+    min_year_scrutins = MIN_SCRUTINS_YEAR.get(scope, 10)
     for year in range(year_start, min(year_end, 2027)):
         year_str = str(year)
         # Format clé : "numero|YYYY-MM-DD" — extraire l'année de la partie date
         year_indices = [j for j, s in enumerate(scrutins) if "|" in s and s.split("|")[1][:4] == year_str]
 
-        if len(year_indices) < 10:
+        if len(year_indices) < min_year_scrutins:
             # Trop peu de scrutins pour une PCA fiable — utiliser le score global
             for canon, score in calibrated_global.items():
                 entry = {
                     "year": year,
                     "score": round(score, 2),
                     "source": "pca_session_global",
+                    "scope": scope,
                     "r2": round(r2, 3),
                 }
                 if canon in ci_global:
@@ -347,6 +365,7 @@ def compute_session_scores(
                 "year": year,
                 "score": round(score, 2),
                 "source": "pca_calibrated",
+                "scope": scope,
                 "r2": round(r2_year, 3),
                 "n_scrutins": len(year_indices),
             }
@@ -354,38 +373,39 @@ def compute_session_scores(
                 entry["ci"] = [round(ci_year[canon][0], 2), round(ci_year[canon][1], 2)]
             results[canon].append(entry)
 
-    # Ajouter les ancres CHES (score direct)
-    ches_years = [d["year"] for d in ches_data if year_start <= d["year"] <= year_end and d["canonical"]]
-    for d in ches_data:
-        if year_start <= d["year"] <= year_end and d["canonical"]:
-            results[d["canonical"]].append({
-                "year": d["year"],
-                "score": round(d["score"], 2),
-                "source": "ches_anchor",
-                "lrgen_raw": d.get("lrgen_raw"),
-            })
+    # Ajouter les ancres CHES (score direct, indépendant du scope de votes)
+    if include_ches:
+        for d in ches_data:
+            if year_start <= d["year"] <= year_end and d["canonical"]:
+                results[d["canonical"]].append({
+                    "year": d["year"],
+                    "score": round(d["score"], 2),
+                    "source": "ches_anchor",
+                    "lrgen_raw": d.get("lrgen_raw"),
+                })
 
     return dict(results)
 
 
 def dedupe_entries(entries: list[dict]) -> list[dict]:
     """
-    Conserve UNE entrée par couple (année, famille de source), où la famille
-    est "ches" (ancre d'experts) ou "pca" (mesure par les votes).
+    Conserve UNE entrée par triplet (année, famille de source, scope), où la
+    famille est "ches" (ancre d'experts) ou "pca" (mesure par les votes) et le
+    scope distingue "tous" / "solennels" pour les mesures pca.
 
-    Les deux familles coexistent pour une même année : le front-end choisit
-    ensuite le mode d'affichage (votes seuls, CHES seul, ou hybride).
+    Toutes les combinaisons coexistent pour une même année : le front-end
+    choisit ensuite le mode et le scope d'affichage.
     Au sein de la famille pca : pca_calibrated > pca_session_global.
     """
     FAMILY = {"ches_anchor": "ches", "pca_calibrated": "pca", "pca_session_global": "pca"}
     PRIORITY = {"ches_anchor": 0, "pca_calibrated": 0, "pca_session_global": 1}
 
-    seen: dict[tuple[int, str], dict] = {}
+    seen: dict[tuple, dict] = {}
     for entry in entries:
-        key = (entry["year"], FAMILY.get(entry["source"], "pca"))
+        key = (entry["year"], FAMILY.get(entry["source"], "pca"), entry.get("scope"))
         if key not in seen or PRIORITY.get(entry["source"], 9) < PRIORITY.get(seen[key]["source"], 9):
             seen[key] = entry
-    return sorted(seen.values(), key=lambda x: (x["year"], x["source"]))
+    return sorted(seen.values(), key=lambda x: (x["year"], x["source"], x.get("scope") or ""))
 
 
 def main() -> None:
@@ -399,14 +419,31 @@ def main() -> None:
     all_scores: dict[str, list[dict]] = defaultdict(list)
 
     for session in SESSIONS:
-        groupes, scrutins, mat = load_vote_matrix(session)
+        groupes, scrutins, mat, types = load_vote_matrix(session)
         if mat.size == 0:
             print(f"Session {session} : pas de matrice de votes disponible")
             continue
 
-        session_scores = compute_session_scores(session, groupes, scrutins, mat, ches_data, mapping)
+        # Passe 1 : tous les scrutins (+ ancres CHES)
+        session_scores = compute_session_scores(
+            session, groupes, scrutins, mat, ches_data, mapping,
+            scope="tous", include_ches=True,
+        )
         for canon, entries in session_scores.items():
             all_scores[canon].extend(entries)
+
+        # Passe 2 : scrutins solennels uniquement (haute salience)
+        sol_indices = [j for j, s in enumerate(scrutins) if types.get(s, "SPO") in SOLENNEL_CODES]
+        if len(sol_indices) >= 10:
+            sol_scrutins = [scrutins[j] for j in sol_indices]
+            sol_scores = compute_session_scores(
+                session, groupes, sol_scrutins, mat[:, sol_indices], ches_data, mapping,
+                scope="solennels", include_ches=False,
+            )
+            for canon, entries in sol_scores.items():
+                all_scores[canon].extend(entries)
+        else:
+            print(f"  Session {session} [solennels] : {len(sol_indices)} scrutins < 10, skip")
 
     # Dédupliquer et trier par année
     for canon in all_scores:

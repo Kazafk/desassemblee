@@ -137,12 +137,15 @@ def load_scrutins(leg: str, force: bool = False) -> list[dict]:
     return scrutins
 
 
-def build_matrix(leg: str, scrutins: list[dict], organes: dict[str, str]) -> dict:
+def build_matrix(leg: str, scrutins: list[dict], organes: dict[str, str]) -> tuple[dict, dict]:
     """
-    Construit {groupe_abbrev_lower: {"numero|date": +1|-1|0}}.
-    Même seuil de majorité que fetch_clair.build_vote_matrix (±0.3).
+    Construit ({groupe_abbrev_lower: {"numero|date": +1|-1|0}},
+               {"numero|date": codeTypeVote}).
+    Seuil de majorité ±0.3. Le second dict permet de filtrer les scrutins
+    par type (SPO ordinaire, SPS solennel, MOC censure...) en aval.
     """
     matrix: dict[str, dict[str, int]] = defaultdict(dict)
+    types: dict[str, str] = {}
     unknown_refs: dict[str, int] = defaultdict(int)
 
     for s in scrutins:
@@ -151,6 +154,7 @@ def build_matrix(leg: str, scrutins: list[dict], organes: dict[str, str]) -> dic
         if not numero or not date:
             continue
         key = f"{numero}|{date}"
+        types[key] = (s.get("typeVote") or {}).get("codeTypeVote", "SPO")
 
         try:
             groupes = ensure_list(s["ventilationVotes"]["organe"]["groupes"]["groupe"])
@@ -181,7 +185,7 @@ def build_matrix(leg: str, scrutins: list[dict], organes: dict[str, str]) -> dic
     if unknown_refs:
         print(f"  organeRef inconnus (ignorés) : {dict(unknown_refs)}")
 
-    return dict(matrix)
+    return dict(matrix), types
 
 
 def main() -> None:
@@ -190,15 +194,17 @@ def main() -> None:
     for leg in ("14", "15", "16", "17"):
         current = leg == CURRENT_SESSION
         out_path = OUT_DIR / f"session_{leg}_vote_matrix.json"
-        if out_path.exists() and not current:
+        types_path = OUT_DIR / f"session_{leg}_scrutin_types.json"
+        if out_path.exists() and types_path.exists() and not current:
             print(f"\nLégislature {leg} : matrice déjà présente, skip ({out_path.name})")
             continue
 
         print(f"\n--- Législature {leg}{' (courante, re-téléchargée)' if current else ''} ---")
         scrutins = load_scrutins(leg, force=current)
-        matrix = build_matrix(leg, scrutins, organes)
+        matrix, types = build_matrix(leg, scrutins, organes)
 
         out_path.write_text(json.dumps(matrix, ensure_ascii=False), encoding="utf-8")
+        types_path.write_text(json.dumps(types, ensure_ascii=False), encoding="utf-8")
         n_scrutins = len(set(k for v in matrix.values() for k in v))
         print(f"  Matrice : {len(matrix)} groupes × {n_scrutins} scrutins -> {out_path.name}")
         print(f"  Groupes : {sorted(matrix.keys())}")

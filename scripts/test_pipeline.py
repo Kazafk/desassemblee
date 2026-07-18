@@ -51,19 +51,19 @@ class TestCalibrate(unittest.TestCase):
         calibrated, _ = calibrate(pca, ches, verbose=False)
         self.assertAlmostEqual(calibrated["inconnu"], 2.5, places=6)
 
-    def test_clip_dans_la_marge_de_tolerance(self):
-        # Projection à ~10.5 (dans [-11, +11]) : clippée à 10, pas exclue
-        pca = {"a": -1.0, "b": 1.0, "borderline": 1.167}
+    def test_score_dans_l_echelle_conserve(self):
+        pca = {"a": -1.0, "b": 1.0, "haut": 1.1}
         ches = {"a": -9.0, "b": 9.0}
         calibrated, _ = calibrate(pca, ches, verbose=False)
-        self.assertEqual(calibrated["borderline"], 10.0)
+        self.assertAlmostEqual(calibrated["haut"], 9.9, places=6)
 
     def test_exclusion_hors_domaine(self):
-        # Projection très au-delà de la tolérance : le point est exclu
-        # (cas UDI 2012 : extrapolation sans ancre CHES hors échelle)
-        pca = {"a": -1.0, "b": 1.0, "extreme": 100.0}
+        # Toute projection au-delà de ±10 est exclue : aucune ancre CHES ne
+        # dépasse ±9.6, au-delà c'est de l'extrapolation non fiable
+        # (cas UDI 2012-2016, sans ancre CHES)
+        pca = {"a": -1.0, "b": 1.0, "extreme": 1.2}
         ches = {"a": -9.0, "b": 9.0}
-        calibrated, _ = calibrate(pca, ches, verbose=False)
+        calibrated, _ = calibrate(pca, ches, verbose=False)  # extreme -> 10.8
         self.assertNotIn("extreme", calibrated)
         self.assertIn("a", calibrated)
         self.assertIn("b", calibrated)
@@ -233,6 +233,15 @@ class TestDedupeEntries(unittest.TestCase):
         result = dedupe_entries(entries)
         self.assertEqual(len(result), 2)
         self.assertEqual({e["source"] for e in result}, {"pca_calibrated", "ches_anchor"})
+
+    def test_scopes_tous_et_solennels_coexistent(self):
+        entries = [
+            {"year": 2025, "score": -5.4, "source": "pca_calibrated", "scope": "tous"},
+            {"year": 2025, "score": -3.9, "source": "pca_calibrated", "scope": "solennels"},
+        ]
+        result = dedupe_entries(entries)
+        self.assertEqual(len(result), 2)
+        self.assertEqual({e["scope"] for e in result}, {"tous", "solennels"})
 
     def test_calibrated_prefere_a_session_global(self):
         entries = [

@@ -3,6 +3,9 @@ data/raw/clair/*
 !data/raw/clair/session_14_vote_matrix.json
 !data/raw/clair/session_15_vote_matrix.json
 !data/raw/clair/session_16_vote_matrix.json
+!data/raw/clair/session_14_scrutin_types.json
+!data/raw/clair/session_15_scrutin_types.json
+!data/raw/clair/session_16_scrutin_types.json
 data/raw/an_archives/*
 # Référentiel organes extrait de l'AMO30 : committé (léger, évite 13 Mo de re-téléchargement en CI)
 !data/raw/an_archives/organes_gp.json

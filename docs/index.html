@@ -33,6 +33,15 @@
             <button class="mode-btn" data-mode="votes" role="tab" aria-selected="false">Votes</button>
             <button class="mode-btn" data-mode="ches" role="tab" aria-selected="false">Experts</button>
           </div>
+          <div class="mode-selector" id="scopeSelector" role="tablist" aria-label="Périmètre des scrutins">
+            <button class="mode-btn active" data-scope="tous" role="tab" aria-selected="true">Tous les scrutins</button>
+            <button class="mode-btn" data-scope="solennels" role="tab" aria-selected="false">Solennels</button>
+          </div>
+          <div class="family-filter" id="familyFilter" aria-label="Filtrer par bloc politique">
+            <button class="family-btn" data-bloc="gauche">Gauche</button>
+            <button class="family-btn" data-bloc="centre">Centre</button>
+            <button class="family-btn" data-bloc="droite">Droite</button>
+          </div>
           <button class="btn-toggle-all" id="toggleAll">Tout afficher</button>
           <span class="chart-hint">Cliquez sur un parti pour le mettre en valeur</span>
         </div>
