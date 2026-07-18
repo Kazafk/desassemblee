@@ -138,7 +138,7 @@ def main() -> None:
             "updated": str(date.today()),
             "sources": [
                 "API CLAIR — votes AN (sessions 14-17)",
-                "Chapel Hill Expert Survey 2023 (chesdata.eu)",
+                "Chapel Hill Expert Survey, vagues 2014/2019/2024 (chesdata.eu)",
             ],
             "method": "PCA sur votes parlementaires AN, calibrée sur CHES (variable lrgen)",
             "scale": "[-10, +10] — gauche (négatif) à droite (positif)",

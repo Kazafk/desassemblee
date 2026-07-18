@@ -26,16 +26,11 @@ jobs:
       - name: Installer les dépendances
         run: pip install -r scripts/requirements.txt
 
-      - name: Mettre en cache les données API CLAIR (sessions archivées)
-        uses: actions/cache@v4
-        with:
-          path: data/raw/clair/
-          key: clair-cache-${{ github.run_id }}
-          restore-keys: |
-            clair-cache-
+      - name: Tests unitaires
+        run: python -m unittest discover -s scripts -p "test_*.py"
 
-      - name: Télécharger les nouveaux votes (session active)
-        run: python scripts/fetch_clair.py
+      - name: Télécharger les votes (open data AN, législature courante)
+        run: python scripts/fetch_an_archives.py
 
       - name: Calculer les scores gauche-droite
         run: python scripts/compute_scores.py

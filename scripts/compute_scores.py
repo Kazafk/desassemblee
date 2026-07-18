@@ -18,15 +18,15 @@ from sklearn.decomposition import PCA
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 
-ROOT = Path(__file__).parent.parent
+from common import ROOT, SESSIONS, SESSION_YEARS
+
 CACHE_DIR = ROOT / "data" / "raw" / "clair"
 CHES_FILE = ROOT / "data" / "processed" / "ches_france.json"
 MAPPING_FILE = Path(__file__).parent / "groups_mapping.json"
 OUT = ROOT / "data" / "processed" / "scores_computed.json"
 
-SESSIONS = ["14", "15", "16", "17"]
-# Années approximatives de chaque session
-SESSION_YEARS = {"14": (2012, 2017), "15": (2017, 2022), "16": (2022, 2024), "17": (2024, 2030)}
+# Nombre de rééchantillonnages bootstrap pour les intervalles de confiance
+N_BOOTSTRAP = 200
 
 
 def load_vote_matrix(session: str) -> tuple[list[str], list[str], np.ndarray]:
@@ -55,10 +55,14 @@ def load_vote_matrix(session: str) -> tuple[list[str], list[str], np.ndarray]:
     return groupes, scrutins, mat
 
 
-def pca_scores(mat: np.ndarray, groupes: list[str]) -> dict[str, float]:
+def pca_scores(mat: np.ndarray, groupes: list[str], verbose: bool = True) -> dict[str, list[float]]:
     """
-    Applique PCA(n=1) et retourne le score brut par groupe.
-    Impute les NaN par la médiane de chaque colonne avant PCA.
+    Applique PCA(n=2) et retourne les 2 composantes par groupe.
+
+    Pourquoi 2 composantes : dans un hémicycle sans majorité, le premier
+    axe PCA capture souvent le clivage gouvernement/opposition (LFI et RN
+    du même côté) et non gauche/droite. La calibration CHES (régression
+    bivariée) choisit ensuite la meilleure direction dans ce plan.
     """
     if mat.size == 0 or mat.shape[0] < 2:
         return {}
@@ -66,68 +70,173 @@ def pca_scores(mat: np.ndarray, groupes: list[str]) -> dict[str, float]:
     imputer = SimpleImputer(strategy="median")
     mat_imputed = imputer.fit_transform(mat)
 
+    n_comp = max(1, min(2, mat.shape[0] - 1, mat_imputed.shape[1]))
+
     # Ignorer les avertissements sklearn sur les matrices constantes
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        pca = PCA(n_components=1)
-        scores_raw = pca.fit_transform(mat_imputed)[:, 0]
+        pca = PCA(n_components=n_comp)
+        scores_raw = pca.fit_transform(mat_imputed)
 
-    explained = pca.explained_variance_ratio_[0]
-    print(f"    PCA variance expliquée : {explained:.1%}")
-    if explained < 0.15:
-        print(f"    ATTENTION : faible variance expliquée ({explained:.1%}) — axe G/D peu structuré")
+    if verbose:
+        ratios = pca.explained_variance_ratio_
+        detail = " + ".join(f"{r:.1%}" for r in ratios)
+        print(f"    PCA variance expliquée : {detail} = {ratios.sum():.1%}")
+        if ratios.sum() < 0.3:
+            print(f"    ATTENTION : plan factoriel faible ({ratios.sum():.1%})")
 
-    return {g: float(s) for g, s in zip(groupes, scores_raw)}
+    return {g: [float(v) for v in s] for g, s in zip(groupes, scores_raw)}
 
 
-def calibrate(pca_dict: dict[str, float], ches_scores: dict[str, float]) -> tuple[dict[str, float], float]:
+def calibrate(pca_dict: dict, ches_scores: dict[str, float], verbose: bool = True) -> tuple[dict[str, float], float]:
     """
-    Régression linéaire PCA → CHES sur les partis communs.
-    Retourne (scores calibrés, r²).
-    Si moins de 2 partis en commun, retourne les scores PCA normalisés sur [-10,+10].
-    """
-    common = [(pca_dict[s], ches_scores[s]) for s in pca_dict if s in ches_scores]
+    Calibration supervisée : régression multivariée CHES ≈ a·c1 + b·c2 + c
+    sur les partis communs. La régression sélectionne la direction du plan
+    factoriel qui correspond le mieux à l'axe gauche-droite académique —
+    y compris quand l'axe 1 de la PCA capture un autre clivage
+    (gouvernement/opposition). Le signe est absorbé par les coefficients.
 
-    if len(common) >= 2:
-        x = np.array([c[0] for c in common])
-        y = np.array([c[1] for c in common])
+    Retourne (scores calibrés sur [-10,+10], r²).
+    Repli : régression 1D si 2 partis communs, normalisation min-max sinon.
+    """
+    # Normaliser : accepter des scalaires (tests, rétrocompatibilité) ou des vecteurs
+    vec = {g: np.atleast_1d(np.asarray(v, dtype=float)) for g, v in pca_dict.items()}
+    common_slugs = [s for s in vec if s in ches_scores]
+
+    def fallback_minmax() -> tuple[dict[str, float], float]:
+        if not vec:
+            return {}, 0.0
+        firsts = {g: float(v[0]) for g, v in vec.items()}
+        vmin, vmax = min(firsts.values()), max(firsts.values())
+        if vmax == vmin:
+            return {g: 0.0 for g in firsts}, 0.0
+        return {
+            g: float(np.clip((v - vmin) / (vmax - vmin) * 20 - 10, -10, 10))
+            for g, v in firsts.items()
+        }, 0.0
+
+    if len(common_slugs) >= 3:
+        X = np.array([vec[s] for s in common_slugs])           # (k, n_comp)
+        y = np.array([ches_scores[s] for s in common_slugs])
+        A = np.hstack([X, np.ones((len(X), 1))])               # + intercept
+        try:
+            coef, *_ = np.linalg.lstsq(A, y, rcond=None)
+        except np.linalg.LinAlgError:
+            return fallback_minmax()
+        pred = A @ coef
+        ss_res = float(np.sum((y - pred) ** 2))
+        ss_tot = float(np.sum((y - y.mean()) ** 2))
+        r2 = 1 - ss_res / ss_tot if ss_tot > 0 else 0.0
+        if verbose:
+            print(f"    Calibration CHES (bivariée) : r²={r2:.3f} sur {len(common_slugs)} partis communs")
+            if r2 < 0.5:
+                print(f"    ATTENTION : r²={r2:.3f} < 0.5, calibration peu fiable")
+        calibrated = {
+            g: float(np.clip(np.dot(np.append(v, 1.0), coef), -10, 10))
+            for g, v in vec.items()
+        }
+        return calibrated, r2
+
+    elif len(common_slugs) == 2:
+        x = np.array([vec[s][0] for s in common_slugs])
+        y = np.array([ches_scores[s] for s in common_slugs])
+        if np.ptp(x) == 0:
+            return fallback_minmax()
         slope, intercept, r, _, _ = linregress(x, y)
         r2 = r ** 2
-        print(f"    Calibration CHES : r²={r2:.3f} sur {len(common)} partis communs")
-        if r2 < 0.5:
-            print(f"    ATTENTION : r²={r2:.3f} < 0.5, calibration peu fiable")
-        calibrated = {g: float(np.clip(slope * v + intercept, -10, 10)) for g, v in pca_dict.items()}
+        if verbose:
+            print(f"    Calibration CHES (1D, 2 partis) : r²={r2:.3f}")
+        calibrated = {
+            g: float(np.clip(slope * v[0] + intercept, -10, 10)) for g, v in vec.items()
+        }
         return calibrated, r2
+
     else:
-        print(f"    Calibration CHES impossible ({len(common)} partis communs < 2), normalisation [-10,+10]")
-        if not pca_dict:
-            return {}, 0.0
-        vals = list(pca_dict.values())
-        vmin, vmax = min(vals), max(vals)
-        if vmax == vmin:
-            return {g: 0.0 for g in pca_dict}, 0.0
-        calibrated = {g: float(np.clip((v - vmin) / (vmax - vmin) * 20 - 10, -10, 10)) for g, v in pca_dict.items()}
-        return calibrated, 0.0
+        if verbose:
+            print(f"    Calibration CHES impossible ({len(common_slugs)} partis communs), normalisation [-10,+10]")
+        return fallback_minmax()
+
+
+def canonicalize(raw: dict, api_to_canonical: dict[str, str | None]) -> dict:
+    """
+    Convertit {api_slug: composantes} en {canonical_slug: composantes}.
+    Moyenne (composante par composante) quand plusieurs slugs API pointent
+    vers le même canonique (ex. session 17 : NFP et LFI-NFP → lfi).
+    Accepte scalaires ou vecteurs.
+    """
+    sums: dict[str, np.ndarray] = {}
+    counts: dict[str, int] = {}
+    for api_slug, v in raw.items():
+        canon = api_to_canonical.get(api_slug)
+        if not canon:
+            continue
+        arr = np.atleast_1d(np.asarray(v, dtype=float))
+        sums[canon] = sums.get(canon, np.zeros_like(arr)) + arr
+        counts[canon] = counts.get(canon, 0) + 1
+    return {g: list(s / counts[g]) for g, s in sums.items()}
+
+
+def bootstrap_ci(
+    mat: np.ndarray,
+    groupes: list[str],
+    api_to_canonical: dict[str, str | None],
+    ches_anchor: dict[str, float],
+    n_boot: int = N_BOOTSTRAP,
+    seed: int = 42,
+) -> dict[str, tuple[float, float]]:
+    """
+    Intervalle de confiance à 95 % par groupe, obtenu en rééchantillonnant
+    les scrutins (colonnes) avec remise puis en recalculant PCA + calibration.
+    L'orientation de chaque réplicat est assurée par la pente de la régression
+    de calibration (le signe PCA arbitraire est absorbé par la pente).
+    Retourne {canonical_slug: (borne_basse, borne_haute)}.
+    """
+    if mat.size == 0 or mat.shape[1] < 10:
+        return {}
+
+    rng = np.random.default_rng(seed)
+    n_scrutins = mat.shape[1]
+    samples: dict[str, list[float]] = defaultdict(list)
+
+    for _ in range(n_boot):
+        idx = rng.integers(0, n_scrutins, n_scrutins)
+        try:
+            raw = pca_scores(mat[:, idx], groupes, verbose=False)
+            canonical = canonicalize(raw, api_to_canonical)
+            calibrated, _ = calibrate(canonical, ches_anchor, verbose=False)
+        except (ValueError, np.linalg.LinAlgError):
+            continue  # réplicat dégénéré (colonnes identiques...), on l'ignore
+        for g, v in calibrated.items():
+            samples[g].append(v)
+
+    if not samples:
+        return {}
+
+    return {
+        g: (float(np.percentile(vals, 2.5)), float(np.percentile(vals, 97.5)))
+        for g, vals in samples.items()
+    }
 
 
 def get_ches_scores_for_session(ches_data: list[dict], session: str, mapping: dict) -> dict[str, float]:
     """
     Pour une session donnée, trouve les scores CHES les plus proches.
-    Stratégie : utiliser toutes les vagues CHES disponibles ≤ year_end + 2.
-    Pour les sessions récentes sans vague CHES contemporaine, utilise la dernière disponible.
+    Stratégie : vague CHES la plus proche du MILIEU de la session
+    (éviter les calibrations anachroniques, ex. session 14 sur CHES 2019).
     Retourne {slug_canonique: score_calibré}.
     """
     year_start, year_end = SESSION_YEARS[session]
+    midpoint = (year_start + min(year_end, 2026)) / 2
 
-    # Toutes les vagues disponibles avant la fin de session (avec marge +2 ans)
-    available = [d for d in ches_data if d["year"] <= year_end + 2 and d["canonical"]]
-
+    available = [d for d in ches_data if d["canonical"]]
     if not available:
         return {}
 
-    # Utiliser uniquement la vague la plus récente disponible pour cette session
-    max_year = max(d["year"] for d in available)
-    closest_wave = [d for d in available if d["year"] == max_year]
+    # Vague dont l'année est la plus proche du milieu de session
+    wave_years = sorted(set(d["year"] for d in available))
+    best_year = min(wave_years, key=lambda y: abs(y - midpoint))
+    closest_wave = [d for d in available if d["year"] == best_year]
+    print(f"    Vague CHES retenue pour session {session} : {best_year} (milieu de session ~{midpoint:.0f})")
 
     by_canonical: dict[str, list[float]] = defaultdict(list)
     for d in closest_wave:
@@ -164,24 +273,20 @@ def compute_session_scores(
 
     # Score global de session (sur tous les scrutins)
     raw_global = pca_scores(mat, groupes)
-
-    # Canoniser les slugs
-    canonical_global: dict[str, float] = {}
-    for api_slug, raw in raw_global.items():
-        canon = api_to_canonical.get(api_slug)
-        if canon:
-            if canon not in canonical_global:
-                canonical_global[canon] = raw
-            else:
-                canonical_global[canon] = (canonical_global[canon] + raw) / 2
-
+    canonical_global = canonicalize(raw_global, api_to_canonical)
     calibrated_global, r2 = calibrate(canonical_global, ches_anchor)
 
-    # Assurer que LFI < RN (corriger le signe si inversé)
+    # Garde-fou : la pente de la régression oriente déjà l'axe, ce cas
+    # ne devrait jamais se produire sur une session calibrée. S'il se
+    # produit, la calibration elle-même est suspecte — on alerte fort.
     if "lfi" in calibrated_global and "rn" in calibrated_global:
         if calibrated_global["lfi"] > calibrated_global["rn"]:
-            print(f"    Inversion du signe PCA (LFI={calibrated_global['lfi']:.1f} > RN={calibrated_global['rn']:.1f})")
+            print(f"    ALERTE : LFI ({calibrated_global['lfi']:.1f}) > RN ({calibrated_global['rn']:.1f}) "
+                  f"apres calibration — l'axe PCA ne reflete probablement pas le clivage G/D")
             calibrated_global = {g: -v for g, v in calibrated_global.items()}
+
+    # Intervalle de confiance bootstrap sur le score global de session
+    ci_global = bootstrap_ci(mat, groupes, api_to_canonical, ches_anchor)
 
     # Scores annuels : sous-matrice par année civile
     year_start, year_end = SESSION_YEARS[session]
@@ -190,42 +295,45 @@ def compute_session_scores(
     for year in range(year_start, min(year_end, 2027)):
         year_str = str(year)
         # Format clé : "numero|YYYY-MM-DD" — extraire l'année de la partie date
-        year_indices = [j for j, s in enumerate(scrutins) if s.split("|")[1][:4] == year_str if "|" in s]
+        year_indices = [j for j, s in enumerate(scrutins) if "|" in s and s.split("|")[1][:4] == year_str]
 
         if len(year_indices) < 10:
             # Trop peu de scrutins pour une PCA fiable — utiliser le score global
             for canon, score in calibrated_global.items():
-                results[canon].append({
+                entry = {
                     "year": year,
                     "score": round(score, 2),
                     "source": "pca_session_global",
                     "r2": round(r2, 3),
-                })
+                }
+                if canon in ci_global:
+                    entry["ci"] = [round(ci_global[canon][0], 2), round(ci_global[canon][1], 2)]
+                results[canon].append(entry)
             continue
 
         mat_year = mat[:, year_indices]
         raw_year = pca_scores(mat_year, groupes)
-
-        canonical_year: dict[str, float] = {}
-        for api_slug, raw in raw_year.items():
-            canon = api_to_canonical.get(api_slug)
-            if canon:
-                canonical_year[canon] = raw
-
+        canonical_year = canonicalize(raw_year, api_to_canonical)
         calibrated_year, r2_year = calibrate(canonical_year, ches_anchor)
 
         if "lfi" in calibrated_year and "rn" in calibrated_year:
             if calibrated_year["lfi"] > calibrated_year["rn"]:
+                print(f"    ALERTE annee {year} : LFI > RN apres calibration")
                 calibrated_year = {g: -v for g, v in calibrated_year.items()}
 
+        ci_year = bootstrap_ci(mat_year, groupes, api_to_canonical, ches_anchor)
+
         for canon, score in calibrated_year.items():
-            results[canon].append({
+            entry = {
                 "year": year,
                 "score": round(score, 2),
                 "source": "pca_calibrated",
                 "r2": round(r2_year, 3),
                 "n_scrutins": len(year_indices),
-            })
+            }
+            if canon in ci_year:
+                entry["ci"] = [round(ci_year[canon][0], 2), round(ci_year[canon][1], 2)]
+            results[canon].append(entry)
 
     # Ajouter les ancres CHES (score direct)
     ches_years = [d["year"] for d in ches_data if year_start <= d["year"] <= year_end and d["canonical"]]

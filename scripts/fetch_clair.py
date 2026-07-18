@@ -36,17 +36,19 @@ ROOT = Path(__file__).parent.parent
 CACHE_DIR = ROOT / "data" / "raw" / "clair"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
+from common import SESSION_YEARS, CURRENT_SESSION
+
 BASE_URL = "https://api.clair.vote/api/v1"
 CHAMBRE = "assemblee"
 REQUEST_DELAY = 6.5  # secondes (rate limit : 10 req/min)
 
-# Sessions législatives (numéro session → plage d'années approximative)
-SESSION_YEARS = {
-    "14": (2012, 2017),
-    "15": (2017, 2022),
-    "16": (2022, 2024),
-    "17": (2024, 2030),
-}
+# Seuls champs conservés dans le cache scrutins (le JSON brut de l'API
+# pèse ~430 Mo avec les textes complets ; trimmé il tombe à quelques Mo)
+SCRUTIN_FIELDS = ("numero", "date", "session", "importance", "titre")
+
+
+def trim_scrutin(s: dict) -> dict:
+    return {k: s[k] for k in SCRUTIN_FIELDS if k in s}
 
 # Nombre max de scrutins à utiliser par session pour la matrice de votes
 MAX_SCRUTINS_PER_SESSION = 300
@@ -58,8 +60,15 @@ def get(path: str, params: dict | None = None, retries: int = 3) -> dict:
         try:
             r = requests.get(url, params=params, timeout=30)
             if r.status_code == 429:
-                wait = int(r.headers.get("x-ratelimit-reset", 60))
-                print(f"  Rate limit, attente {wait}s...")
+                try:
+                    wait = int(float(r.headers.get("x-ratelimit-reset", "60")))
+                except ValueError:
+                    wait = 60
+                # Certaines API renvoient un timestamp UNIX, pas une durée
+                if wait > 1_000_000:
+                    wait = int(wait - time.time())
+                wait = min(max(wait, 5), 180)  # borné entre 5s et 3min
+                print(f"  Rate limit, attente {wait}s...", flush=True)
                 time.sleep(wait)
                 continue
             r.raise_for_status()
@@ -100,6 +109,12 @@ def fetch_all_scrutins() -> list[dict]:
     if cache_path.exists():
         existing = json.loads(cache_path.read_text(encoding="utf-8"))
         if existing:
+            # Migration : trimmer les caches anciens qui contiennent
+            # encore tous les champs bruts de l'API (~430 Mo)
+            if any(k not in SCRUTIN_FIELDS for k in existing[0]):
+                existing = [trim_scrutin(s) for s in existing]
+                cache_path.write_text(json.dumps(existing, ensure_ascii=False), encoding="utf-8")
+                print(f"  Cache migre (champs reduits a {SCRUTIN_FIELDS})")
             max_numero = max(s["numero"] for s in existing)
             print(f"  Cache : {len(existing)} scrutins (dernier n°{max_numero})")
 
@@ -153,7 +168,7 @@ def fetch_all_scrutins() -> list[dict]:
         if page % 10 == 0:
             print(f"  Page {page} (n.{items[-1]['numero']} -> {items[0]['numero']})...")
 
-    all_scrutins = existing + new_scrutins
+    all_scrutins = existing + [trim_scrutin(s) for s in new_scrutins]
     # Trier par numero croissant
     all_scrutins.sort(key=lambda s: s["numero"])
     # Dédupliquer
@@ -164,7 +179,8 @@ def fetch_all_scrutins() -> list[dict]:
             seen.add(s["numero"])
             deduped.append(s)
 
-    cache_path.write_text(json.dumps(deduped, ensure_ascii=False, indent=2), encoding="utf-8")
+    # Pas d'indent : fichier volumineux, l'indentation double sa taille
+    cache_path.write_text(json.dumps(deduped, ensure_ascii=False), encoding="utf-8")
     print(f"  {len(deduped)} scrutins total enregistrés")
     return deduped
 
@@ -198,10 +214,20 @@ def select_scrutins_per_session(all_scrutins: list[dict]) -> dict[str, list[dict
 
 
 def fetch_votes_pour_scrutin(numero: int) -> list[dict]:
-    """Retourne les votes individuels pour un scrutin (liste brute)."""
-    # Certains scrutins ont jusqu'à 577 votants (nombre de députés)
-    data = get(f"/scrutins/{numero}/votes", {"limit": 600})
-    return data.get("data", [])
+    """
+    Retourne les votes individuels pour un scrutin.
+    L'API impose limit <= 100 : pagination via meta.hasNext
+    (jusqu'à 6 pages pour un scrutin où les 577 députés votent).
+    """
+    votes: list[dict] = []
+    page = 1
+    while True:
+        data = get(f"/scrutins/{numero}/votes", {"limit": 100, "page": page})
+        votes.extend(data.get("data", []))
+        if not data.get("meta", {}).get("hasNext"):
+            break
+        page += 1
+    return votes
 
 
 def build_vote_matrix(session: str, scrutins: list[dict]) -> dict:
@@ -212,25 +238,42 @@ def build_vote_matrix(session: str, scrutins: list[dict]) -> dict:
     matrix_path = CACHE_DIR / f"session_{session}_vote_matrix.json"
 
     # Pour les sessions archivées, réutiliser le cache
-    if matrix_path.exists() and session != "17":
+    if matrix_path.exists() and session != CURRENT_SESSION:
         print(f"  Matrice session {session} : chargée depuis le cache")
         return json.loads(matrix_path.read_text(encoding="utf-8"))
 
     ENCODE = {"pour": 1, "contre": -1, "abstention": 0}
     matrix: dict[str, dict[str, int]] = defaultdict(dict)
+
+    # Reprendre un checkpoint partiel si présent (crash / interruption)
+    done_keys: set[str] = set()
+    if matrix_path.exists():
+        try:
+            partial = json.loads(matrix_path.read_text(encoding="utf-8"))
+            for slug, votes_dict in partial.items():
+                matrix[slug].update(votes_dict)
+            done_keys = {k for v in partial.values() for k in v}
+            print(f"  Session {session} : checkpoint charge ({len(done_keys)} scrutins deja traites)", flush=True)
+        except (json.JSONDecodeError, AttributeError):
+            print(f"  Session {session} : checkpoint corrompu, repart de zero", flush=True)
+
     total = len(scrutins)
+    processed = 0
 
     for i, scrutin in enumerate(scrutins):
         numero = scrutin["numero"]
         date = str(scrutin.get("date", ""))[:10]
 
+        if f"{numero}|{date}" in done_keys:
+            continue
+
         if i % 20 == 0:
-            print(f"  Session {session} : scrutin {i+1}/{total} (n°{numero}, {date})...")
+            print(f"  Session {session} : scrutin {i+1}/{total} (n.{numero}, {date})...", flush=True)
 
         try:
             votes = fetch_votes_pour_scrutin(numero)
         except Exception as e:
-            print(f"    Erreur n°{numero}: {e}")
+            print(f"    Erreur n.{numero}: {e}", flush=True)
             continue
 
         # Agréger par groupe
@@ -249,6 +292,11 @@ def build_vote_matrix(session: str, scrutins: list[dict]) -> dict:
             if vals:
                 avg = sum(vals) / len(vals)
                 matrix[slug][scrutin_key] = 1 if avg > 0.3 else (-1 if avg < -0.3 else 0)
+
+        processed += 1
+        # Checkpoint périodique : un crash ne coûte plus que 25 scrutins
+        if processed % 25 == 0:
+            matrix_path.write_text(json.dumps(dict(matrix), ensure_ascii=False), encoding="utf-8")
 
     result = dict(matrix)
     matrix_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")

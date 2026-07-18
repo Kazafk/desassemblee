@@ -1,13 +1,13 @@
 {
   "meta": {
-    "updated": "2026-07-17",
+    "updated": "2026-07-18",
     "sources": [
-      "API CLAIR — votes AN (session 17)",
-      "Chapel Hill Expert Survey 2023"
+      "API CLAIR — votes AN (sessions 14-17)",
+      "Chapel Hill Expert Survey, vagues 2014/2019/2024 (chesdata.eu)"
     ],
-    "method": "ACP sur votes parlementaires AN, calibrée sur CHES (lrgen)",
+    "method": "PCA sur votes parlementaires AN, calibrée sur CHES (variable lrgen)",
     "scale": "[-10, +10] — gauche (négatif) à droite (positif)",
-    "note": "Données de démonstration session 17 (2024-2026). Lancez les scripts pour les données complètes 2012-2026."
+    "note": "Points ◆ = ancre CHES (enquête académique). Points ● = PCA sur votes."
   },
   "parties": [
     {
@@ -18,49 +18,269 @@
       "family": "gauche_radicale",
       "scores": [
         {
-          "year": 2024,
-          "score": -4.8,
+          "year": 2014,
+          "score": -6.6,
+          "source": "ches_anchor",
+          "lrgen_raw": 1.7
+        },
+        {
+          "year": 2017,
+          "score": -8.41,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.974,
+          "n_scrutins": 357,
+          "ci": [
+            -8.61,
+            -8.17
+          ]
+        },
+        {
+          "year": 2018,
+          "score": -8.57,
+          "source": "pca_calibrated",
+          "r2": 0.967,
+          "n_scrutins": 1256,
+          "ci": [
+            -8.76,
+            -8.31
+          ]
+        },
+        {
+          "year": 2019,
+          "score": -7.5,
+          "source": "ches_anchor",
+          "lrgen_raw": 1.25
+        },
+        {
+          "year": 2020,
+          "score": -8.56,
+          "source": "pca_calibrated",
+          "r2": 0.979,
+          "n_scrutins": 899,
+          "ci": [
+            -8.75,
+            -8.32
+          ]
+        },
+        {
+          "year": 2021,
+          "score": -9.16,
+          "source": "pca_calibrated",
+          "r2": 0.948,
+          "n_scrutins": 931,
+          "ci": [
+            -9.51,
+            -8.62
+          ]
+        },
+        {
+          "year": 2022,
+          "score": -6.83,
+          "source": "pca_calibrated",
+          "r2": 0.94,
+          "n_scrutins": 822,
+          "ci": [
+            -7.08,
+            -6.59
+          ]
+        },
+        {
+          "year": 2023,
+          "score": -7.38,
+          "source": "pca_calibrated",
+          "r2": 0.962,
+          "n_scrutins": 2393,
+          "ci": [
+            -7.53,
+            -7.22
+          ]
+        },
+        {
+          "year": 2024,
+          "score": -8.36,
+          "source": "ches_anchor",
+          "lrgen_raw": 0.818
         },
         {
           "year": 2025,
-          "score": -5.1,
+          "score": -6.53,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.943,
+          "n_scrutins": 4422,
+          "ci": [
+            -6.62,
+            -6.44
+          ]
         },
         {
           "year": 2026,
-          "score": -4.9,
+          "score": -6.71,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.939,
+          "n_scrutins": 3470,
+          "ci": [
+            -6.81,
+            -6.64
+          ]
         }
       ]
     },
     {
       "slug": "gdr",
-      "name": "Gauche Démocrate et Républicaine",
+      "name": "Gauche Démocrate et Républicaine (PCF)",
       "name_short": "GDR/PCF",
       "color": "#8B0000",
       "family": "gauche_radicale",
       "scores": [
         {
-          "year": 2024,
-          "score": -4.9,
+          "year": 2012,
+          "score": -5.82,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.949,
+          "n_scrutins": 82,
+          "ci": [
+            -6.5,
+            -3.13
+          ]
+        },
+        {
+          "year": 2013,
+          "score": -5.89,
+          "source": "pca_calibrated",
+          "r2": 0.958,
+          "n_scrutins": 676,
+          "ci": [
+            -6.12,
+            -5.63
+          ]
+        },
+        {
+          "year": 2014,
+          "score": -6.5,
+          "source": "ches_anchor",
+          "lrgen_raw": 1.75
+        },
+        {
+          "year": 2015,
+          "score": -3.01,
+          "source": "pca_calibrated",
+          "r2": 0.477,
+          "n_scrutins": 213,
+          "ci": [
+            -3.88,
+            -2.27
+          ]
+        },
+        {
+          "year": 2016,
+          "score": -6.15,
+          "source": "pca_calibrated",
+          "r2": 0.977,
+          "n_scrutins": 144,
+          "ci": [
+            -6.7,
+            -5.14
+          ]
+        },
+        {
+          "year": 2017,
+          "score": -7.75,
+          "source": "pca_calibrated",
+          "r2": 0.974,
+          "n_scrutins": 357,
+          "ci": [
+            -7.97,
+            -7.44
+          ]
+        },
+        {
+          "year": 2018,
+          "score": -7.61,
+          "source": "pca_calibrated",
+          "r2": 0.967,
+          "n_scrutins": 1256,
+          "ci": [
+            -7.82,
+            -7.37
+          ]
+        },
+        {
+          "year": 2019,
+          "score": -7.75,
+          "source": "ches_anchor",
+          "lrgen_raw": 1.125
+        },
+        {
+          "year": 2020,
+          "score": -7.45,
+          "source": "pca_calibrated",
+          "r2": 0.979,
+          "n_scrutins": 899,
+          "ci": [
+            -7.71,
+            -7.21
+          ]
+        },
+        {
+          "year": 2021,
+          "score": -6.88,
+          "source": "pca_calibrated",
+          "r2": 0.948,
+          "n_scrutins": 931,
+          "ci": [
+            -7.4,
+            -6.33
+          ]
+        },
+        {
+          "year": 2022,
+          "score": -5.61,
+          "source": "pca_calibrated",
+          "r2": 0.94,
+          "n_scrutins": 822,
+          "ci": [
+            -5.97,
+            -5.26
+          ]
+        },
+        {
+          "year": 2023,
+          "score": -5.35,
+          "source": "pca_calibrated",
+          "r2": 0.962,
+          "n_scrutins": 2393,
+          "ci": [
+            -5.57,
+            -5.06
+          ]
+        },
+        {
+          "year": 2024,
+          "score": -6.54,
+          "source": "ches_anchor",
+          "lrgen_raw": 1.727
         },
         {
           "year": 2025,
-          "score": -5.0,
+          "score": -4.99,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.943,
+          "n_scrutins": 4422,
+          "ci": [
+            -5.11,
+            -4.87
+          ]
         },
         {
           "year": 2026,
-          "score": -5.1,
+          "score": -4.63,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.939,
+          "n_scrutins": 3470,
+          "ci": [
+            -4.78,
+            -4.45
+          ]
         }
       ]
     },
@@ -72,22 +292,154 @@
       "family": "gauche",
       "scores": [
         {
-          "year": 2024,
-          "score": -4.2,
+          "year": 2012,
+          "score": -3.05,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.949,
+          "n_scrutins": 82,
+          "ci": [
+            -3.95,
+            -1.84
+          ]
+        },
+        {
+          "year": 2013,
+          "score": -1.53,
+          "source": "pca_calibrated",
+          "r2": 0.958,
+          "n_scrutins": 676,
+          "ci": [
+            -1.84,
+            -1.22
+          ]
+        },
+        {
+          "year": 2014,
+          "score": -2.33,
+          "source": "ches_anchor",
+          "lrgen_raw": 3.833
+        },
+        {
+          "year": 2015,
+          "score": -1.13,
+          "source": "pca_calibrated",
+          "r2": 0.477,
+          "n_scrutins": 213,
+          "ci": [
+            -1.84,
+            -0.14
+          ]
+        },
+        {
+          "year": 2016,
+          "score": -1.36,
+          "source": "pca_calibrated",
+          "r2": 0.977,
+          "n_scrutins": 144,
+          "ci": [
+            -2.27,
+            -0.5
+          ]
+        },
+        {
+          "year": 2017,
+          "score": -2.3,
+          "source": "pca_calibrated",
+          "r2": 0.974,
+          "n_scrutins": 357,
+          "ci": [
+            -2.9,
+            -1.74
+          ]
+        },
+        {
+          "year": 2018,
+          "score": -2.12,
+          "source": "pca_calibrated",
+          "r2": 0.967,
+          "n_scrutins": 1256,
+          "ci": [
+            -2.63,
+            -1.65
+          ]
+        },
+        {
+          "year": 2019,
+          "score": -4.0,
+          "source": "ches_anchor",
+          "lrgen_raw": 3.0
+        },
+        {
+          "year": 2020,
+          "score": -2.62,
+          "source": "pca_calibrated",
+          "r2": 0.979,
+          "n_scrutins": 899,
+          "ci": [
+            -3.1,
+            -2.2
+          ]
+        },
+        {
+          "year": 2021,
+          "score": -2.03,
+          "source": "pca_calibrated",
+          "r2": 0.948,
+          "n_scrutins": 931,
+          "ci": [
+            -3.37,
+            -1.05
+          ]
+        },
+        {
+          "year": 2022,
+          "score": -3.11,
+          "source": "pca_calibrated",
+          "r2": 0.94,
+          "n_scrutins": 822,
+          "ci": [
+            -3.43,
+            -2.78
+          ]
+        },
+        {
+          "year": 2023,
+          "score": -3.0,
+          "source": "pca_calibrated",
+          "r2": 0.962,
+          "n_scrutins": 2393,
+          "ci": [
+            -3.22,
+            -2.78
+          ]
+        },
+        {
+          "year": 2024,
+          "score": -3.09,
+          "source": "ches_anchor",
+          "lrgen_raw": 3.455
         },
         {
           "year": 2025,
-          "score": -4.3,
+          "score": -5.38,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.943,
+          "n_scrutins": 4422,
+          "ci": [
+            -5.48,
+            -5.27
+          ]
         },
         {
           "year": 2026,
-          "score": -4.2,
+          "score": -5.37,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.939,
+          "n_scrutins": 3470,
+          "ci": [
+            -5.48,
+            -5.24
+          ]
         }
       ]
     },
@@ -99,49 +451,288 @@
       "family": "gauche",
       "scores": [
         {
-          "year": 2024,
-          "score": -4.5,
+          "year": 2012,
+          "score": -2.63,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.949,
+          "n_scrutins": 82,
+          "ci": [
+            -5.54,
+            -1.97
+          ]
+        },
+        {
+          "year": 2013,
+          "score": -5.24,
+          "source": "pca_calibrated",
+          "r2": 0.958,
+          "n_scrutins": 676,
+          "ci": [
+            -5.54,
+            -4.89
+          ]
+        },
+        {
+          "year": 2014,
+          "score": -3.83,
+          "source": "ches_anchor",
+          "lrgen_raw": 3.083
+        },
+        {
+          "year": 2015,
+          "score": -6.59,
+          "source": "pca_calibrated",
+          "r2": 0.477,
+          "n_scrutins": 213,
+          "ci": [
+            -6.76,
+            -6.2
+          ]
+        },
+        {
+          "year": 2016,
+          "score": -4.54,
+          "source": "pca_calibrated",
+          "r2": 0.977,
+          "n_scrutins": 144,
+          "ci": [
+            -5.7,
+            -3.37
+          ]
+        },
+        {
+          "year": 2019,
+          "score": -5.0,
+          "source": "ches_anchor",
+          "lrgen_raw": 2.5
+        },
+        {
+          "year": 2022,
+          "score": -7.33,
+          "source": "pca_calibrated",
+          "r2": 0.94,
+          "n_scrutins": 822,
+          "ci": [
+            -7.53,
+            -7.15
+          ]
+        },
+        {
+          "year": 2023,
+          "score": -7.47,
+          "source": "pca_calibrated",
+          "r2": 0.962,
+          "n_scrutins": 2393,
+          "ci": [
+            -7.61,
+            -7.33
+          ]
+        },
+        {
+          "year": 2024,
+          "score": -5.4,
+          "source": "ches_anchor",
+          "lrgen_raw": 2.3
         },
         {
           "year": 2025,
-          "score": -4.6,
+          "score": -6.67,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.943,
+          "n_scrutins": 4422,
+          "ci": [
+            -6.74,
+            -6.61
+          ]
         },
         {
           "year": 2026,
-          "score": -4.5,
+          "score": -6.67,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.939,
+          "n_scrutins": 3470,
+          "ci": [
+            -6.74,
+            -6.6
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "prg",
+      "name": "Parti Radical de Gauche",
+      "name_short": "PRG",
+      "color": "#FF6B9D",
+      "family": "centre_gauche",
+      "scores": [
+        {
+          "year": 2012,
+          "score": -3.6,
+          "source": "pca_calibrated",
+          "r2": 0.949,
+          "n_scrutins": 82,
+          "ci": [
+            -4.65,
+            -1.77
+          ]
+        },
+        {
+          "year": 2013,
+          "score": -2.0,
+          "source": "pca_calibrated",
+          "r2": 0.958,
+          "n_scrutins": 676,
+          "ci": [
+            -2.38,
+            -1.62
+          ]
+        },
+        {
+          "year": 2014,
+          "score": -2.36,
+          "source": "ches_anchor",
+          "lrgen_raw": 3.818
+        },
+        {
+          "year": 2015,
+          "score": -0.38,
+          "source": "pca_calibrated",
+          "r2": 0.477,
+          "n_scrutins": 213,
+          "ci": [
+            -1.4,
+            0.19
+          ]
+        },
+        {
+          "year": 2016,
+          "score": -2.78,
+          "source": "pca_calibrated",
+          "r2": 0.977,
+          "n_scrutins": 144,
+          "ci": [
+            -3.37,
+            -2.03
+          ]
         }
       ]
     },
     {
       "slug": "liot",
-      "name": "LIOT",
+      "name": "Libertés, Indépendants, Outre-mer et Territoires",
       "name_short": "LIOT",
       "color": "#78909C",
       "family": "centre",
       "scores": [
         {
-          "year": 2024,
-          "score": -0.3,
+          "year": 2017,
+          "score": 1.01,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.974,
+          "n_scrutins": 357,
+          "ci": [
+            0.32,
+            1.47
+          ]
+        },
+        {
+          "year": 2018,
+          "score": 1.02,
+          "source": "pca_calibrated",
+          "r2": 0.967,
+          "n_scrutins": 1256,
+          "ci": [
+            0.36,
+            1.55
+          ]
+        },
+        {
+          "year": 2019,
+          "score": -3.03,
+          "source": "pca_calibrated",
+          "r2": 0.978,
+          "n_scrutins": 804,
+          "ci": [
+            -4.47,
+            -1.63
+          ]
+        },
+        {
+          "year": 2020,
+          "score": -0.56,
+          "source": "pca_calibrated",
+          "r2": 0.979,
+          "n_scrutins": 899,
+          "ci": [
+            -1.73,
+            0.42
+          ]
+        },
+        {
+          "year": 2021,
+          "score": -0.28,
+          "source": "pca_calibrated",
+          "r2": 0.948,
+          "n_scrutins": 931,
+          "ci": [
+            -1.87,
+            0.96
+          ]
+        },
+        {
+          "year": 2022,
+          "score": -0.12,
+          "source": "pca_calibrated",
+          "r2": 0.94,
+          "n_scrutins": 822,
+          "ci": [
+            -0.96,
+            0.6
+          ]
+        },
+        {
+          "year": 2023,
+          "score": -0.38,
+          "source": "pca_calibrated",
+          "r2": 0.962,
+          "n_scrutins": 2393,
+          "ci": [
+            -0.79,
+            0.11
+          ]
+        },
+        {
+          "year": 2024,
+          "score": 0.85,
+          "source": "pca_calibrated",
+          "r2": 0.931,
+          "n_scrutins": 513,
+          "ci": [
+            0.35,
+            1.43
+          ]
         },
         {
           "year": 2025,
-          "score": -0.5,
+          "score": 1.68,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.943,
+          "n_scrutins": 4422,
+          "ci": [
+            1.48,
+            1.85
+          ]
         },
         {
           "year": 2026,
-          "score": -0.4,
+          "score": 0.9,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.939,
+          "n_scrutins": 3470,
+          "ci": [
+            0.72,
+            1.06
+          ]
         }
       ]
     },
@@ -153,49 +744,338 @@
       "family": "centre",
       "scores": [
         {
-          "year": 2024,
-          "score": 1.2,
+          "year": 2014,
+          "score": 1.82,
+          "source": "ches_anchor",
+          "lrgen_raw": 5.909
+        },
+        {
+          "year": 2017,
+          "score": 2.07,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.974,
+          "n_scrutins": 357,
+          "ci": [
+            1.77,
+            2.27
+          ]
+        },
+        {
+          "year": 2018,
+          "score": 1.98,
+          "source": "pca_calibrated",
+          "r2": 0.967,
+          "n_scrutins": 1256,
+          "ci": [
+            1.61,
+            2.25
+          ]
+        },
+        {
+          "year": 2019,
+          "score": 2.25,
+          "source": "ches_anchor",
+          "lrgen_raw": 6.125
+        },
+        {
+          "year": 2020,
+          "score": 2.34,
+          "source": "pca_calibrated",
+          "r2": 0.979,
+          "n_scrutins": 899,
+          "ci": [
+            1.9,
+            2.69
+          ]
+        },
+        {
+          "year": 2021,
+          "score": 2.21,
+          "source": "pca_calibrated",
+          "r2": 0.948,
+          "n_scrutins": 931,
+          "ci": [
+            1.41,
+            2.69
+          ]
+        },
+        {
+          "year": 2022,
+          "score": 1.76,
+          "source": "pca_calibrated",
+          "r2": 0.94,
+          "n_scrutins": 822,
+          "ci": [
+            1.59,
+            1.9
+          ]
+        },
+        {
+          "year": 2023,
+          "score": 2.09,
+          "source": "pca_calibrated",
+          "r2": 0.962,
+          "n_scrutins": 2393,
+          "ci": [
+            1.99,
+            2.19
+          ]
+        },
+        {
+          "year": 2024,
+          "score": 0.73,
+          "source": "ches_anchor",
+          "lrgen_raw": 5.364
         },
         {
           "year": 2025,
-          "score": 1.8,
+          "score": 1.88,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.943,
+          "n_scrutins": 4422,
+          "ci": [
+            1.79,
+            1.98
+          ]
         },
         {
           "year": 2026,
-          "score": 1.5,
+          "score": 1.76,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.939,
+          "n_scrutins": 3470,
+          "ci": [
+            1.69,
+            1.86
+          ]
         }
       ]
     },
     {
       "slug": "renaissance",
-      "name": "Renaissance",
+      "name": "Renaissance (ex-LREM)",
       "name_short": "Renaissance",
       "color": "#FF6D00",
       "family": "centre",
       "scores": [
         {
-          "year": 2024,
-          "score": 2.1,
+          "year": 2017,
+          "score": 2.81,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.974,
+          "n_scrutins": 357,
+          "ci": [
+            2.71,
+            2.95
+          ]
+        },
+        {
+          "year": 2018,
+          "score": 2.8,
+          "source": "pca_calibrated",
+          "r2": 0.967,
+          "n_scrutins": 1256,
+          "ci": [
+            2.69,
+            2.95
+          ]
+        },
+        {
+          "year": 2019,
+          "score": 2.67,
+          "source": "ches_anchor",
+          "lrgen_raw": 6.333
+        },
+        {
+          "year": 2020,
+          "score": 2.59,
+          "source": "pca_calibrated",
+          "r2": 0.979,
+          "n_scrutins": 899,
+          "ci": [
+            2.47,
+            2.81
+          ]
+        },
+        {
+          "year": 2021,
+          "score": 2.6,
+          "source": "pca_calibrated",
+          "r2": 0.948,
+          "n_scrutins": 931,
+          "ci": [
+            2.32,
+            3.08
+          ]
+        },
+        {
+          "year": 2022,
+          "score": 1.94,
+          "source": "pca_calibrated",
+          "r2": 0.94,
+          "n_scrutins": 822,
+          "ci": [
+            1.81,
+            2.1
+          ]
+        },
+        {
+          "year": 2023,
+          "score": 2.04,
+          "source": "pca_calibrated",
+          "r2": 0.962,
+          "n_scrutins": 2393,
+          "ci": [
+            1.95,
+            2.13
+          ]
+        },
+        {
+          "year": 2024,
+          "score": 2.54,
+          "source": "ches_anchor",
+          "lrgen_raw": 6.273
         },
         {
           "year": 2025,
-          "score": 2.5,
+          "score": 2.08,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.943,
+          "n_scrutins": 4422,
+          "ci": [
+            2.0,
+            2.19
+          ]
         },
         {
           "year": 2026,
-          "score": 2.3,
+          "score": 1.86,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.939,
+          "n_scrutins": 3470,
+          "ci": [
+            1.79,
+            1.94
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "udi",
+      "name": "Union des Démocrates et Indépendants",
+      "name_short": "UDI",
+      "color": "#42A5F5",
+      "family": "centre_droit",
+      "scores": [
+        {
+          "year": 2012,
+          "score": 10.0,
+          "source": "pca_calibrated",
+          "r2": 0.949,
+          "n_scrutins": 82,
+          "ci": [
+            8.22,
+            10.0
+          ]
+        },
+        {
+          "year": 2013,
+          "score": 10.0,
+          "source": "pca_calibrated",
+          "r2": 0.958,
+          "n_scrutins": 676,
+          "ci": [
+            10.0,
+            10.0
+          ]
+        },
+        {
+          "year": 2014,
+          "score": 6.08,
+          "source": "pca_calibrated",
+          "r2": 0.737,
+          "n_scrutins": 239,
+          "ci": [
+            3.69,
+            8.46
+          ]
+        },
+        {
+          "year": 2015,
+          "score": 3.08,
+          "source": "pca_calibrated",
+          "r2": 0.477,
+          "n_scrutins": 213,
+          "ci": [
+            1.83,
+            4.84
+          ]
+        },
+        {
+          "year": 2016,
+          "score": 10.0,
+          "source": "pca_calibrated",
+          "r2": 0.977,
+          "n_scrutins": 144,
+          "ci": [
+            7.43,
+            10.0
+          ]
+        },
+        {
+          "year": 2017,
+          "score": 1.91,
+          "source": "pca_calibrated",
+          "r2": 0.974,
+          "n_scrutins": 357,
+          "ci": [
+            1.41,
+            2.23
+          ]
+        },
+        {
+          "year": 2018,
+          "score": 2.01,
+          "source": "pca_calibrated",
+          "r2": 0.967,
+          "n_scrutins": 1256,
+          "ci": [
+            1.51,
+            2.38
+          ]
+        },
+        {
+          "year": 2019,
+          "score": 1.32,
+          "source": "pca_calibrated",
+          "r2": 0.978,
+          "n_scrutins": 804,
+          "ci": [
+            0.19,
+            2.21
+          ]
+        },
+        {
+          "year": 2020,
+          "score": 2.25,
+          "source": "pca_calibrated",
+          "r2": 0.979,
+          "n_scrutins": 899,
+          "ci": [
+            1.1,
+            3.37
+          ]
+        },
+        {
+          "year": 2021,
+          "score": 1.97,
+          "source": "pca_calibrated",
+          "r2": 0.948,
+          "n_scrutins": 931,
+          "ci": [
+            0.13,
+            2.96
+          ]
         }
       ]
     },
@@ -207,22 +1087,54 @@
       "family": "centre_droit",
       "scores": [
         {
-          "year": 2024,
-          "score": 3.5,
+          "year": 2022,
+          "score": 2.06,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.94,
+          "n_scrutins": 822,
+          "ci": [
+            1.94,
+            2.2
+          ]
+        },
+        {
+          "year": 2023,
+          "score": 2.3,
+          "source": "pca_calibrated",
+          "r2": 0.962,
+          "n_scrutins": 2393,
+          "ci": [
+            2.21,
+            2.42
+          ]
+        },
+        {
+          "year": 2024,
+          "score": 3.2,
+          "source": "ches_anchor",
+          "lrgen_raw": 6.6
         },
         {
           "year": 2025,
-          "score": 3.2,
+          "score": 2.79,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.943,
+          "n_scrutins": 4422,
+          "ci": [
+            2.69,
+            2.89
+          ]
         },
         {
           "year": 2026,
-          "score": 3.4,
+          "score": 2.77,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.939,
+          "n_scrutins": 3470,
+          "ci": [
+            2.67,
+            2.85
+          ]
         }
       ]
     },
@@ -234,22 +1146,154 @@
       "family": "droite",
       "scores": [
         {
-          "year": 2024,
-          "score": 4.8,
+          "year": 2012,
+          "score": 5.41,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.949,
+          "n_scrutins": 82,
+          "ci": [
+            4.72,
+            5.49
+          ]
+        },
+        {
+          "year": 2013,
+          "score": 4.96,
+          "source": "pca_calibrated",
+          "r2": 0.958,
+          "n_scrutins": 676,
+          "ci": [
+            4.78,
+            5.1
+          ]
+        },
+        {
+          "year": 2014,
+          "score": 5.33,
+          "source": "ches_anchor",
+          "lrgen_raw": 7.667
+        },
+        {
+          "year": 2015,
+          "score": 1.4,
+          "source": "pca_calibrated",
+          "r2": 0.477,
+          "n_scrutins": 213,
+          "ci": [
+            0.73,
+            2.25
+          ]
+        },
+        {
+          "year": 2016,
+          "score": 5.15,
+          "source": "pca_calibrated",
+          "r2": 0.977,
+          "n_scrutins": 144,
+          "ci": [
+            4.6,
+            5.32
+          ]
+        },
+        {
+          "year": 2017,
+          "score": 4.99,
+          "source": "pca_calibrated",
+          "r2": 0.974,
+          "n_scrutins": 357,
+          "ci": [
+            4.47,
+            5.45
+          ]
+        },
+        {
+          "year": 2018,
+          "score": 4.94,
+          "source": "pca_calibrated",
+          "r2": 0.967,
+          "n_scrutins": 1256,
+          "ci": [
+            4.5,
+            5.36
+          ]
+        },
+        {
+          "year": 2019,
+          "score": 5.75,
+          "source": "ches_anchor",
+          "lrgen_raw": 7.875
+        },
+        {
+          "year": 2020,
+          "score": 5.12,
+          "source": "pca_calibrated",
+          "r2": 0.979,
+          "n_scrutins": 899,
+          "ci": [
+            4.69,
+            5.54
+          ]
+        },
+        {
+          "year": 2021,
+          "score": 4.68,
+          "source": "pca_calibrated",
+          "r2": 0.948,
+          "n_scrutins": 931,
+          "ci": [
+            3.69,
+            5.61
+          ]
+        },
+        {
+          "year": 2022,
+          "score": 7.24,
+          "source": "pca_calibrated",
+          "r2": 0.94,
+          "n_scrutins": 822,
+          "ci": [
+            6.86,
+            7.54
+          ]
+        },
+        {
+          "year": 2023,
+          "score": 5.53,
+          "source": "pca_calibrated",
+          "r2": 0.962,
+          "n_scrutins": 2393,
+          "ci": [
+            5.24,
+            5.83
+          ]
+        },
+        {
+          "year": 2024,
+          "score": 5.46,
+          "source": "ches_anchor",
+          "lrgen_raw": 7.727
         },
         {
           "year": 2025,
-          "score": 4.5,
+          "score": 5.72,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.943,
+          "n_scrutins": 4422,
+          "ci": [
+            5.57,
+            5.82
+          ]
         },
         {
           "year": 2026,
-          "score": 4.7,
+          "score": 6.0,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.939,
+          "n_scrutins": 3470,
+          "ci": [
+            5.86,
+            6.11
+          ]
         }
       ]
     },
@@ -261,22 +1305,66 @@
       "family": "droite_radicale",
       "scores": [
         {
-          "year": 2024,
-          "score": 5.4,
+          "year": 2014,
+          "score": 9.27,
+          "source": "ches_anchor",
+          "lrgen_raw": 9.636
+        },
+        {
+          "year": 2019,
+          "score": 9.5,
+          "source": "ches_anchor",
+          "lrgen_raw": 9.75
+        },
+        {
+          "year": 2022,
+          "score": 6.04,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.94,
+          "n_scrutins": 822,
+          "ci": [
+            5.67,
+            6.4
+          ]
+        },
+        {
+          "year": 2023,
+          "score": 7.41,
+          "source": "pca_calibrated",
+          "r2": 0.962,
+          "n_scrutins": 2393,
+          "ci": [
+            7.25,
+            7.55
+          ]
+        },
+        {
+          "year": 2024,
+          "score": 7.64,
+          "source": "ches_anchor",
+          "lrgen_raw": 8.818
         },
         {
           "year": 2025,
-          "score": 4.9,
+          "score": 7.27,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.943,
+          "n_scrutins": 4422,
+          "ci": [
+            7.2,
+            7.34
+          ]
         },
         {
           "year": 2026,
-          "score": 5.2,
+          "score": 7.17,
           "source": "pca_calibrated",
-          "r2": 0.92
+          "r2": 0.939,
+          "n_scrutins": 3470,
+          "ci": [
+            7.07,
+            7.27
+          ]
         }
       ]
     }
@@ -284,23 +1372,23 @@
   "elections": [
     {
       "year": 2012,
-      "label": "Législatives 2012",
+      "label": "Législatives juin 2012",
       "note": "Victoire PS"
     },
     {
       "year": 2017,
-      "label": "Législatives 2017",
+      "label": "Législatives juin 2017",
       "note": "Victoire LREM"
     },
     {
       "year": 2022,
-      "label": "Législatives 2022",
+      "label": "Législatives juin 2022",
       "note": "NUPES / Ensemble"
     },
     {
       "year": 2024,
-      "label": "Législatives 2024",
-      "note": "NFP en tête"
+      "label": "Législatives juillet 2024",
+      "note": "Victoire NFP (1er tour)"
     }
   ]
 }

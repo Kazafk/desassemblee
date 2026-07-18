@@ -14,27 +14,30 @@ La position d'un parti sur l'axe gauche-droite est souvent auto-déclarée (grou
 Votes AN (API CLAIR)  ──►  PCA  ──►  Calibration CHES  ──►  Score [-10, +10]
 ```
 
-### Couche 1 — Votes parlementaires (API CLAIR)
+### Couche 1 — Votes parlementaires (open data Assemblée nationale)
 
-Pour chaque session législative (14e–17e, de 2012 à aujourd'hui) :
+Pour chaque législature (14e–17e, de 2012 à aujourd'hui) :
 
-1. Récupération des scrutins à l'Assemblée Nationale via l'**[API CLAIR](https://api.clair.vote/)**
-2. Construction d'une matrice `(groupes × scrutins)` : **+1** pour, **−1** contre, **0** abstention/absent
-3. **ACP (PCA)** sur cette matrice → le premier composant capte ~80 % de la variance, ce qui correspond empiriquement à l'axe gauche-droite dominant dans les votes
+1. Téléchargement des scrutins officiels depuis **[data.assemblee-nationale.fr](https://data.assemblee-nationale.fr/)** (archives JSON complètes, rafraîchies quotidiennement pour la législature en cours)
+2. Construction d'une matrice `(groupes × scrutins)` à partir du décompte des voix par groupe : **+1** pour, **−1** contre, **0** abstention (seuil de majorité ±0,3)
+3. **ACP à 2 composantes** sur cette matrice → le plan factoriel capture les deux clivages dominants du vote (typiquement gauche/droite et majorité/opposition)
 
-Cette méthode produit un score continu par groupe et par année civile, sans aucune hypothèse a priori sur l'idéologie des partis.
+Cette méthode produit un positionnement continu par groupe et par année civile, sans aucune hypothèse a priori sur l'idéologie des partis.
 
 ### Couche 2 — Calibration CHES (étalon académique)
 
-Les scores PCA bruts n'ont pas d'échelle interprétable. On les convertit en valeurs sur **[-10, +10]** grâce au **[Chapel Hill Expert Survey (CHES)](https://chesdata.eu/)** :
+Les composantes PCA brutes n'ont ni échelle ni orientation interprétables. On les projette sur **[-10, +10]** grâce au **[Chapel Hill Expert Survey (CHES)](https://chesdata.eu/)** :
 
 - Enquête bisannuelle menée par des chercheurs en science politique
-- Variable utilisée : `lrgen` (positionnement général gauche-droite, 0–10)
-- Vagues disponibles pour la France : **2014, 2019, 2024**
-- Normalisation : `score = (lrgen − 5) × 2`
-- Calibration : régression linéaire `score_calibré = a × score_PCA + b` sur les partis communs
+- Variable utilisée : `lrgen` (positionnement général gauche-droite, 0–10), normalisée en `(lrgen − 5) × 2`
+- Vagues utilisées : **2014** (14e législature), **2019** (15e), **2024** (16e-17e) — chaque législature est calibrée sur la vague la plus proche de son milieu
+- **Calibration supervisée** : régression bivariée `score = a·c1 + b·c2 + c` sur les partis communs — CHES sélectionne la direction du plan factoriel qui correspond à l'axe gauche-droite, même quand le premier axe PCA capture le clivage gouvernement/opposition (hémicycle sans majorité)
 
-La qualité de la calibration est mesurée par r² (valeur cible > 0,7).
+Qualité mesurée par r² : **0,93-0,98** sur les sessions 15-17, ≥ 0,74 sur la 14e (une année faible : 2016, période des frondeurs).
+
+### Incertitude — bootstrap
+
+Chaque score annuel est accompagné d'un **intervalle de confiance à 95 %** obtenu par bootstrap (200 rééchantillonnages des scrutins avec remise, PCA + calibration recalculées à chaque réplicat). Les bandes translucides du graphique matérialisent cette incertitude.
 
 ---
 
@@ -62,22 +65,26 @@ désassemblée/
 ├── docs/                          # Site GitHub Pages
 │   ├── index.html                 # Page principale (style journal)
 │   ├── style.css                  # Design variables (palette crème + serif)
-│   ├── app.js                     # Visualisation D3.js v7
+│   ├── app.js                     # Visualisation D3.js v7 (courbes + bandes IC 95 %)
 │   └── data/
 │       └── scores.json            # Données finales (générées par le pipeline)
 │
 ├── scripts/
+│   ├── common.py                  # Constantes partagées (sessions, chemins)
 │   ├── fetch_ches.py              # Extraction scores CHES France
-│   ├── fetch_clair.py             # Fetch votes AN via API CLAIR (avec cache)
-│   ├── compute_scores.py          # PCA + calibration → scores par parti/année
+│   ├── fetch_an_archives.py       # Source principale : open data AN (législatures 14-17)
+│   ├── fetch_clair.py             # Alternative API CLAIR (legacy, non utilisé par la CI)
+│   ├── compute_scores.py          # PCA 2D + calibration bivariée + bootstrap IC
 │   ├── build_data.py              # Assemblage scores.json final
-│   ├── groups_mapping.json        # Mapping slugs API → slugs canoniques (par session)
+│   ├── test_pipeline.py           # Tests unitaires (python -m unittest)
+│   ├── groups_mapping.json        # Mapping sigles AN → slugs canoniques (par législature)
 │   └── requirements.txt
 │
 ├── data/
 │   ├── raw/
 │   │   ├── ches/                  # CSV CHES (téléchargement manuel, non versionné)
-│   │   └── clair/                 # Cache JSON API CLAIR (gitignored)
+│   │   ├── an_archives/           # Zips open data AN (non versionnés, sauf organes_gp.json)
+│   │   └── clair/                 # Matrices de votes (14-16 committées, statiques)
 │   └── processed/
 │       ├── ches_france.json       # Scores CHES France extraits
 │       └── scores_computed.json   # Scores PCA calibrés avant mise en forme
@@ -107,16 +114,19 @@ pip install -r scripts/requirements.txt
 # 1. Extraire les scores CHES France (rapide, ~1s)
 python scripts/fetch_ches.py
 
-# 2. Télécharger les votes depuis l'API CLAIR
-#    ⚠ Longue opération au premier lancement (~30-45 min pour 8 000+ scrutins)
-#    Les sessions archivées (14-16) sont mises en cache — les runs suivants sont rapides.
-python scripts/fetch_clair.py
+# 2. Télécharger les votes depuis l'open data AN (~1 min, ~50 Mo au premier run)
+#    Les législatures archivées (14-16) ne sont jamais reconstruites ;
+#    la législature courante est re-téléchargée à chaque exécution.
+python scripts/fetch_an_archives.py
 
-# 3. Calculer les scores PCA + calibration CHES
+# 3. Calculer les scores PCA + calibration CHES + bootstrap (~2 min)
 python scripts/compute_scores.py
 
 # 4. Assembler le fichier final
 python scripts/build_data.py
+
+# Tests unitaires
+python -m unittest discover -s scripts -p "test_*.py"
 ```
 
 Le fichier `docs/data/scores.json` est mis à jour et prêt pour la visualisation.
@@ -145,9 +155,9 @@ URL : `https://kazafk.github.io/desassemblee/`
 
 Un **GitHub Action** tourne chaque lundi à 6h UTC :
 
-1. Récupère uniquement les nouveaux scrutins depuis le dernier run (fetch incrémental)
-2. Recalcule les scores de la session en cours
-3. Commit automatiquement `docs/data/scores.json` si des changements sont détectés
+1. Lance les tests unitaires (barrière qualité)
+2. Re-télécharge l'archive scrutins de la législature courante (~25 Mo, rafraîchie quotidiennement par l'AN)
+3. Recalcule les scores et commit automatiquement `docs/data/scores.json` si changement
 
 Le fichier CHES étant publié tous les 2–3 ans, il est mis à jour manuellement (déposer le nouveau CSV dans `data/raw/ches/` et relancer `fetch_ches.py`).
 
@@ -157,15 +167,17 @@ Le fichier CHES étant publié tous les 2–3 ans, il est mis à jour manuelleme
 
 | Source | Usage | Licence |
 |---|---|---|
-| [API CLAIR](https://api.clair.vote/) | Votes parlementaires AN (sessions 14–17) | Ouverte, sans authentification |
+| [Open data Assemblée nationale](https://data.assemblee-nationale.fr/) | Scrutins et votes par groupe (législatures 14–17) | Licence ouverte Etalab |
 | [Chapel Hill Expert Survey](https://chesdata.eu/) | Calibration gauche-droite (lrgen, vagues 2014/2019/2024) | Libre pour usage académique |
+| [API CLAIR](https://api.clair.vote/) | Alternative legacy (17e législature uniquement) | Ouverte, sans authentification |
 
 ---
 
 ## Limites méthodologiques
 
-- **Sénat exclu** : l'API CLAIR ne couvre que l'Assemblée Nationale
+- **Sénat exclu** : seule l'Assemblée nationale est couverte
 - **Groupes parlementaires ≠ partis** : un groupe peut regrouper plusieurs partis ; le mapping `groups_mapping.json` est maintenu manuellement à chaque législature
-- **Absences non distinguées des abstentions** : les deux sont encodés 0 dans la matrice
-- **CHES bisannuel** : entre deux vagues, les scores de calibration sont interpolés depuis la dernière vague disponible
-- **Partis sans présence à l'AN** absents du graphique (ex. : DLF, Reconquête)
+- **Absences non comptées** : le score d'un groupe sur un scrutin est la majorité de ses exprimés (pour/contre/abstention)
+- **CHES bisannuel** : chaque législature est calibrée sur une seule vague (la plus proche de son milieu) ; les variations intra-législature reposent sur les votes seuls
+- **Partis sans groupe à l'AN** absents du graphique (ex. : Reconquête, UDR exclu faute d'ancre CHES)
+- **Calibration bivariée** : avec 5-9 partis d'ancrage et 3 paramètres, le r² est mécaniquement optimiste — les intervalles bootstrap donnent une mesure d'incertitude plus honnête

@@ -9,11 +9,13 @@ const ASPECT  = 0.48; // hauteur / largeur
 
 let activeParties = new Set();   // slugs visibles
 let highlightedParty = null;     // slug mis en valeur par hover légende
+let cachedData = null;           // données chargées une seule fois
 
 async function main() {
   let data;
   try {
     data = await d3.json(DATA_URL);
+    cachedData = data;
   } catch (e) {
     document.getElementById("chart").innerHTML =
       `<p style="padding:2rem;font-family:monospace;color:#888">
@@ -150,10 +152,28 @@ function renderChart(data) {
 
   const tooltip = document.getElementById("tooltip");
 
+  // ── Générateur de bande de confiance (bootstrap 95 %)
+  const bandGen = d3.area()
+    .x(d => xScale(d.year))
+    .y0(d => yScale(d.ci[0]))
+    .y1(d => yScale(d.ci[1]))
+    .curve(d3.curveMonotoneX)
+    .defined(d => d.ci != null && d.score != null);
+
   // ── Rendu des courbes par parti
   data.parties.forEach(party => {
     const sorted = [...party.scores].sort((a, b) => a.year - b.year);
     const visible = activeParties.has(party.slug);
+
+    // Bande de confiance (sous la ligne, si ≥ 2 points avec IC)
+    if (sorted.filter(d => d.ci).length >= 2) {
+      g.append("path")
+        .datum(sorted)
+        .attr("class", `party-band party-band-${party.slug}`)
+        .attr("fill", party.color)
+        .attr("opacity", visible ? 0.10 : 0.015)
+        .attr("d", bandGen);
+    }
 
     // Ligne principale
     const path = g.append("path")
@@ -195,6 +215,7 @@ function renderChart(data) {
             <div class="tooltip-score" style="color:${party.color}">${pt.score > 0 ? "+" : ""}${pt.score.toFixed(1)}</div>
             <div class="tooltip-meta">${pt.year} · ${sourceLabel}</div>
             ${pt.r2 != null ? `<div class="tooltip-meta">r²&nbsp;=&nbsp;${pt.r2.toFixed(2)}</div>` : ""}
+            ${pt.ci ? `<div class="tooltip-meta">IC&nbsp;95&nbsp;% : [${pt.ci[0].toFixed(1)}, ${pt.ci[1].toFixed(1)}]</div>` : ""}
           `;
           positionTooltip(event);
           tooltip.classList.add("visible");
@@ -268,6 +289,7 @@ function applyVisibility(data) {
     const visible = activeParties.has(party.slug);
     d3.selectAll(`.party-${party.slug}`).attr("opacity", visible ? 1 : 0.08);
     d3.selectAll(`.party-dot-${party.slug}`).attr("opacity", visible ? 1 : 0.08);
+    d3.selectAll(`.party-band-${party.slug}`).attr("opacity", visible ? 0.10 : 0.015);
 
     const item = document.querySelector(`.legend-item[data-slug="${party.slug}"]`);
     if (item) item.classList.toggle("dimmed", !visible);
@@ -299,12 +321,11 @@ function setupToggleAll(data) {
 let resizeTimer;
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(async () => {
-    const data = await d3.json(DATA_URL).catch(() => null);
-    if (data) {
-      renderChart(data);
-      renderLegend(data);
-      setupToggleAll(data);
+  resizeTimer = setTimeout(() => {
+    if (cachedData) {
+      renderChart(cachedData);
+      renderLegend(cachedData);
+      setupToggleAll(cachedData);
     }
   }, 200);
 });
