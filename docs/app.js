@@ -12,6 +12,7 @@ let highlightedParty = null;     // slug mis en valeur par hover légende
 let cachedData = null;           // données chargées une seule fois
 let displayMode = "hybride";     // "hybride" | "votes" | "ches"
 let displayScope = "tous";       // "tous" | "solennels"
+let displayAxis = "lrgen";       // "lrgen" | "lrecon" | "galtan"
 let firstRender = true;          // n'animer le tracé qu'au premier chargement
 
 const MODE_DESCRIPTIONS = {
@@ -21,6 +22,18 @@ const MODE_DESCRIPTIONS = {
 };
 
 const SCOPE_NOTE = " Périmètre restreint aux scrutins solennels (textes majeurs, motions de censure) : ~2 % des votes, forte salience médiatique — l'incertitude est plus large.";
+
+const AXIS_NOTES = {
+  lrecon: " Axe économique (CHES lrecon) : redistribution, fiscalité, rôle de l'État — le RN y apparaît bien plus central que sur l'axe général.",
+  galtan: " Axe sociétal (CHES galtan) : immigration, autorité, mœurs — du pôle libertaire/écologiste (bas) au pôle autoritaire/national (haut).",
+};
+
+// Labels de l'axe Y selon l'axe idéologique affiché
+const AXIS_Y_LABELS = {
+  lrgen:  ["◀ Gauche", "Droite ▶"],
+  lrecon: ["◀ Gauche éco.", "Droite éco. ▶"],
+  galtan: ["◀ Libertaire (GAL)", "Autoritaire (TAN) ▶"],
+};
 
 // Blocs politiques pour le filtre rapide (champ family de scores.json)
 const FAMILY_BLOCS = {
@@ -56,6 +69,7 @@ async function main() {
   renderLegend(data);
   setupToggleAll(data);
   setupModeSelector(data);
+  setupAxisSelector(data);
   setupScopeSelector(data);
   setupFamilyFilter(data);
 }
@@ -149,20 +163,21 @@ function renderChart(data) {
     )
     .call(gg => gg.select(".domain").attr("stroke", "#CCBBA0"));
 
-  // ── Labels axes Y (négatif = gauche, positif = droite)
+  // ── Labels axes Y (négatif = bas, positif = haut, selon l'axe affiché)
+  const [labelLow, labelHigh] = AXIS_Y_LABELS[displayAxis] || AXIS_Y_LABELS.lrgen;
   g.append("text")
     .attr("class", "axis-label")
     .attr("x", -MARGIN.left + 4)
     .attr("y", yScale(-10) + 16)
     .attr("text-anchor", "start")
-    .text("◀ Gauche");
+    .text(labelLow);
 
   g.append("text")
     .attr("class", "axis-label")
     .attr("x", -MARGIN.left + 4)
     .attr("y", yScale(10) - 8)
     .attr("text-anchor", "start")
-    .text("Droite ▶");
+    .text(labelHigh);
 
   // ── Générateur de ligne courbe
   const lineGen = d3.line()
@@ -215,8 +230,11 @@ function renderChart(data) {
   data.parties.forEach(party => {
     const sorted = [...party.scores].sort((a, b) => a.year - b.year);
     const pcaSeries  = sorted.filter(d =>
-      d.source.startsWith("pca") && (d.scope || "tous") === displayScope);
-    const chesSeries = sorted.filter(d => d.source === "ches_anchor");
+      d.source.startsWith("pca") &&
+      (d.scope || "tous") === displayScope &&
+      (d.axis || "lrgen") === displayAxis);
+    const chesSeries = sorted.filter(d =>
+      d.source === "ches_anchor" && (d.axis || "lrgen") === displayAxis);
     const visible = activeParties.has(party.slug);
 
     // La ligne suit les votes (modes hybride/votes) ou les ancres CHES (mode experts)
@@ -289,12 +307,14 @@ function renderChart(data) {
 function updateDescription() {
   const description = document.getElementById("modeDescription");
   let text = MODE_DESCRIPTIONS[displayMode];
+  if (displayAxis !== "lrgen") text += AXIS_NOTES[displayAxis] || "";
   if (displayScope === "solennels" && displayMode !== "ches") text += SCOPE_NOTE;
   description.textContent = text;
 
   // Le périmètre n'a pas de sens en mode Experts (données CHES, pas votes)
+  // ni sur les axes thématiques (calculés sur tous les scrutins uniquement)
   const scopeSel = document.getElementById("scopeSelector");
-  if (scopeSel) scopeSel.classList.toggle("disabled", displayMode === "ches");
+  if (scopeSel) scopeSel.classList.toggle("disabled", displayMode === "ches" || displayAxis !== "lrgen");
 }
 
 function setupModeSelector(data) {
@@ -309,6 +329,34 @@ function setupModeSelector(data) {
     btn.addEventListener("click", () => {
       if (btn.dataset.mode === displayMode) return;
       displayMode = btn.dataset.mode;
+      container.querySelectorAll(".mode-btn").forEach(b => {
+        b.classList.toggle("active", b === btn);
+        b.setAttribute("aria-selected", String(b === btn));
+      });
+      updateDescription();
+      renderChart(data);
+    });
+  });
+}
+
+function setupAxisSelector(data) {
+  const container = document.getElementById("axisSelector");
+  if (!container) return;
+
+  container.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.axis === displayAxis);
+    btn.setAttribute("aria-selected", String(btn.dataset.axis === displayAxis));
+    btn.addEventListener("click", () => {
+      if (btn.dataset.axis === displayAxis) return;
+      displayAxis = btn.dataset.axis;
+      // Les axes thématiques ne sont calculés que sur tous les scrutins
+      if (displayAxis !== "lrgen" && displayScope !== "tous") {
+        displayScope = "tous";
+        document.querySelectorAll("#scopeSelector .mode-btn").forEach(b => {
+          b.classList.toggle("active", b.dataset.scope === "tous");
+          b.setAttribute("aria-selected", String(b.dataset.scope === "tous"));
+        });
+      }
       container.querySelectorAll(".mode-btn").forEach(b => {
         b.classList.toggle("active", b === btn);
         b.setAttribute("aria-selected", String(b === btn));
@@ -377,6 +425,11 @@ function animateLine(path) {
     .duration(1200)
     .ease(d3.easeQuadInOut)
     .attr("stroke-dashoffset", 0);
+  // Filet de sécurité : si les requestAnimationFrame sont throttlés
+  // (onglet inactif), la transition gèle et la ligne resterait invisible
+  setTimeout(() => {
+    path.interrupt().attr("stroke-dashoffset", 0).attr("stroke-dasharray", null);
+  }, 1600);
 }
 
 function positionTooltip(event) {

@@ -249,17 +249,26 @@ def bootstrap_ci(
     }
 
 
-def get_ches_scores_for_session(ches_data: list[dict], session: str, mapping: dict) -> dict[str, float]:
+def ches_score_field(axis: str) -> str:
+    """Champ de ches_france.json portant le score normalisé de l'axe."""
+    return "score" if axis == "lrgen" else f"score_{axis}"
+
+
+def get_ches_scores_for_session(
+    ches_data: list[dict], session: str, mapping: dict, axis: str = "lrgen"
+) -> dict[str, float]:
     """
     Pour une session donnée, trouve les scores CHES les plus proches.
     Stratégie : vague CHES la plus proche du MILIEU de la session
     (éviter les calibrations anachroniques, ex. session 14 sur CHES 2019).
+    axis : "lrgen" (général), "lrecon" (économique) ou "galtan" (sociétal).
     Retourne {slug_canonique: score_calibré}.
     """
     year_start, year_end = SESSION_YEARS[session]
     midpoint = (year_start + min(year_end, 2026)) / 2
+    field = ches_score_field(axis)
 
-    available = [d for d in ches_data if d["canonical"]]
+    available = [d for d in ches_data if d["canonical"] and field in d]
     if not available:
         return {}
 
@@ -267,11 +276,11 @@ def get_ches_scores_for_session(ches_data: list[dict], session: str, mapping: di
     wave_years = sorted(set(d["year"] for d in available))
     best_year = min(wave_years, key=lambda y: abs(y - midpoint))
     closest_wave = [d for d in available if d["year"] == best_year]
-    print(f"    Vague CHES retenue pour session {session} : {best_year} (milieu de session ~{midpoint:.0f})")
+    print(f"    Vague CHES retenue pour session {session} [{axis}] : {best_year} (milieu ~{midpoint:.0f})")
 
     by_canonical: dict[str, list[float]] = defaultdict(list)
     for d in closest_wave:
-        by_canonical[d["canonical"]].append(d["score"])
+        by_canonical[d["canonical"]].append(d[field])
 
     return {slug: float(np.mean(scores)) for slug, scores in by_canonical.items()}
 
@@ -291,20 +300,23 @@ def compute_session_scores(
     mapping: dict,
     scope: str = "tous",
     include_ches: bool = True,
+    axis: str = "lrgen",
 ) -> dict[str, list[dict]]:
     """
-    Retourne {canonical_slug: [{year, score, source, scope}]}
+    Retourne {canonical_slug: [{year, score, source, scope, axis?}]}
     scope : "tous" (tous les scrutins) ou "solennels" (SPS/MOC/SAT/SSG seuls).
-    include_ches : n'ajouter les ancres CHES qu'une fois (passe "tous").
+    include_ches : ajouter les ancres CHES de cet axe (une fois par axe).
+    axis : axe CHES de calibration — lrgen, lrecon ou galtan. Le champ
+    "axis" n'est écrit dans les entrées que s'il diffère de lrgen (compat).
     """
     if mat.size == 0:
-        print(f"  Session {session} [{scope}] : matrice vide, skip")
+        print(f"  Session {session} [{scope}/{axis}] : matrice vide, skip")
         return {}
 
     api_to_canonical = slugs_for_session(session, mapping)
-    ches_anchor = get_ches_scores_for_session(ches_data, session, mapping)
+    ches_anchor = get_ches_scores_for_session(ches_data, session, mapping, axis=axis)
 
-    print(f"\n  === Session {session} [{scope}] (matrice {mat.shape[0]}×{mat.shape[1]}) ===")
+    print(f"\n  === Session {session} [{scope}/{axis}] (matrice {mat.shape[0]}×{mat.shape[1]}) ===")
 
     # Score global de session (sur tous les scrutins)
     raw_global = pca_scores(mat, groupes)
@@ -343,6 +355,8 @@ def compute_session_scores(
                     "scope": scope,
                     "r2": round(r2, 3),
                 }
+                if axis != "lrgen":
+                    entry["axis"] = axis
                 if canon in ci_global:
                     entry["ci"] = [round(ci_global[canon][0], 2), round(ci_global[canon][1], 2)]
                 results[canon].append(entry)
@@ -369,20 +383,26 @@ def compute_session_scores(
                 "r2": round(r2_year, 3),
                 "n_scrutins": len(year_indices),
             }
+            if axis != "lrgen":
+                entry["axis"] = axis
             if canon in ci_year:
                 entry["ci"] = [round(ci_year[canon][0], 2), round(ci_year[canon][1], 2)]
             results[canon].append(entry)
 
-    # Ajouter les ancres CHES (score direct, indépendant du scope de votes)
+    # Ajouter les ancres CHES de cet axe (score direct, indépendant des votes)
     if include_ches:
+        field = ches_score_field(axis)
         for d in ches_data:
-            if year_start <= d["year"] <= year_end and d["canonical"]:
-                results[d["canonical"]].append({
+            if year_start <= d["year"] <= year_end and d["canonical"] and field in d:
+                anchor = {
                     "year": d["year"],
-                    "score": round(d["score"], 2),
+                    "score": round(d[field], 2),
                     "source": "ches_anchor",
                     "lrgen_raw": d.get("lrgen_raw"),
-                })
+                }
+                if axis != "lrgen":
+                    anchor["axis"] = axis
+                results[d["canonical"]].append(anchor)
 
     return dict(results)
 
@@ -402,10 +422,10 @@ def dedupe_entries(entries: list[dict]) -> list[dict]:
 
     seen: dict[tuple, dict] = {}
     for entry in entries:
-        key = (entry["year"], FAMILY.get(entry["source"], "pca"), entry.get("scope"))
+        key = (entry["year"], FAMILY.get(entry["source"], "pca"), entry.get("scope"), entry.get("axis"))
         if key not in seen or PRIORITY.get(entry["source"], 9) < PRIORITY.get(seen[key]["source"], 9):
             seen[key] = entry
-    return sorted(seen.values(), key=lambda x: (x["year"], x["source"], x.get("scope") or ""))
+    return sorted(seen.values(), key=lambda x: (x["year"], x["source"], x.get("scope") or "", x.get("axis") or ""))
 
 
 def main() -> None:
@@ -424,15 +444,19 @@ def main() -> None:
             print(f"Session {session} : pas de matrice de votes disponible")
             continue
 
-        # Passe 1 : tous les scrutins (+ ancres CHES)
-        session_scores = compute_session_scores(
-            session, groupes, scrutins, mat, ches_data, mapping,
-            scope="tous", include_ches=True,
-        )
-        for canon, entries in session_scores.items():
-            all_scores[canon].extend(entries)
+        # Passes par axe CHES sur tous les scrutins (+ ancres de chaque axe).
+        # Le plan factoriel PCA est identique : seule la direction de
+        # projection (régression vers l'axe CHES choisi) change.
+        for axis in ("lrgen", "lrecon", "galtan"):
+            session_scores = compute_session_scores(
+                session, groupes, scrutins, mat, ches_data, mapping,
+                scope="tous", include_ches=True, axis=axis,
+            )
+            for canon, entries in session_scores.items():
+                all_scores[canon].extend(entries)
 
-        # Passe 2 : scrutins solennels uniquement (haute salience)
+        # Passe solennels (axe général uniquement : trop peu de scrutins
+        # pour décliner la haute salience par axe thématique)
         sol_indices = [j for j, s in enumerate(scrutins) if types.get(s, "SPO") in SOLENNEL_CODES]
         if len(sol_indices) >= 10:
             sol_scrutins = [scrutins[j] for j in sol_indices]

@@ -33,6 +33,11 @@
             <button class="mode-btn" data-mode="votes" role="tab" aria-selected="false">Votes</button>
             <button class="mode-btn" data-mode="ches" role="tab" aria-selected="false">Experts</button>
           </div>
+          <div class="mode-selector" id="axisSelector" role="tablist" aria-label="Axe idéologique">
+            <button class="mode-btn active" data-axis="lrgen" role="tab" aria-selected="true">Général</button>
+            <button class="mode-btn" data-axis="lrecon" role="tab" aria-selected="false">Économie</button>
+            <button class="mode-btn" data-axis="galtan" role="tab" aria-selected="false">Société</button>
+          </div>
           <div class="mode-selector" id="scopeSelector" role="tablist" aria-label="Périmètre des scrutins">
             <button class="mode-btn active" data-scope="tous" role="tab" aria-selected="true">Tous les scrutins</button>
             <button class="mode-btn" data-scope="solennels" role="tab" aria-selected="false">Solennels</button>
@@ -60,6 +65,7 @@
             <p><strong>Comment ce score est-il calculé ?</strong> À partir des votes à l'Assemblée nationale (législatures 14 à 17, open data officiel), on construit une matrice de votes <em>(groupes&thinsp;×&thinsp;scrutins)</em> encodant +1&thinsp;(pour), −1&thinsp;(contre), 0&thinsp;(abstention). Une analyse en composantes principales (ACP) à deux composantes en extrait le plan des clivages dominants.</p>
             <p>Les scores sont <strong>calibrés sur le Chapel Hill Expert Survey</strong> (CHES, chesdata.eu) — une enquête académique bisannuelle où des chercheurs en science politique notent les partis sur un axe 0–10. Une régression bivariée sélectionne, dans le plan factoriel, la direction correspondant à l'axe gauche-droite académique. Les bandes translucides matérialisent l'incertitude (bootstrap, IC à 95&thinsp;%).</p>
             <p><strong>Trois lectures possibles :</strong> le mode <em>Votes</em> montre le comportement parlementaire réel (un parti peut voter plus à gauche ou à droite que son discours) ; le mode <em>Experts</em> montre le positionnement programmatique évalué par le CHES (vagues 2014, 2019, 2024) ; le mode <em>Hybride</em> suit les votes en continu et affiche les ancres d'experts en losanges — l'écart entre les deux est une information en soi.</p>
+            <p><strong>Trois axes idéologiques :</strong> l'axe <em>Général</em> (CHES lrgen) résume le clivage gauche-droite global ; l'axe <em>Économie</em> (lrecon) isole les questions de redistribution et de rôle de l'État ; l'axe <em>Société</em> (galtan) oppose le pôle libertaire/écologiste au pôle autoritaire/national (immigration, autorité, mœurs). La même ACP sur les votes est projetée vers l'axe choisi — le RN, par exemple, apparaît central en économie mais très haut sur l'axe sociétal.</p>
             <p><strong>Sources :</strong> <a href="https://data.assemblee-nationale.fr" target="_blank">Open data Assemblée nationale</a> (scrutins) · <a href="https://chesdata.eu" target="_blank">Chapel Hill Expert Survey</a> (vagues 2014-2024)</p>
             <ul class="legend-sources">
               <li><span class="dot ches">◆</span> Ancre CHES (enquête académique)</li>

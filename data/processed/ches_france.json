@@ -4,223 +4,351 @@
     "canonical": null,
     "year": 2014,
     "lrgen_raw": 6.6,
-    "score": 3.2
+    "score": 3.2,
+    "lrecon_raw": 6.8,
+    "score_lrecon": 3.6,
+    "galtan_raw": 6.167,
+    "score_galtan": 2.333
   },
   {
     "ches_name": "EELV",
     "canonical": "eelv",
     "year": 2014,
     "lrgen_raw": 3.083,
-    "score": -3.833
+    "score": -3.833,
+    "lrecon_raw": 3.25,
+    "score_lrecon": -3.5,
+    "galtan_raw": 1.417,
+    "score_galtan": -7.167
   },
   {
     "ches_name": "Ensemble",
     "canonical": null,
     "year": 2014,
     "lrgen_raw": 2.5,
-    "score": -5.0
+    "score": -5.0,
+    "lrecon_raw": 2.333,
+    "score_lrecon": -5.333,
+    "galtan_raw": 3.5,
+    "score_galtan": -3.0
   },
   {
     "ches_name": "FN",
     "canonical": "rn",
     "year": 2014,
     "lrgen_raw": 9.636,
-    "score": 9.273
+    "score": 9.273,
+    "lrecon_raw": 5.909,
+    "score_lrecon": 1.818,
+    "galtan_raw": 8.917,
+    "score_galtan": 7.833
   },
   {
     "ches_name": "MODEM",
     "canonical": "modem",
     "year": 2014,
     "lrgen_raw": 5.909,
-    "score": 1.818
+    "score": 1.818,
+    "lrecon_raw": 6.455,
+    "score_lrecon": 2.909,
+    "galtan_raw": 5.364,
+    "score_galtan": 0.727
   },
   {
     "ches_name": "MPF",
     "canonical": null,
     "year": 2014,
     "lrgen_raw": 9.1,
-    "score": 8.2
+    "score": 8.2,
+    "lrecon_raw": 8.0,
+    "score_lrecon": 6.0,
+    "galtan_raw": 8.909,
+    "score_galtan": 7.818
   },
   {
     "ches_name": "NC",
     "canonical": null,
     "year": 2014,
     "lrgen_raw": 6.273,
-    "score": 2.545
+    "score": 2.545,
+    "lrecon_raw": 6.889,
+    "score_lrecon": 3.778,
+    "galtan_raw": 6.222,
+    "score_galtan": 2.444
   },
   {
     "ches_name": "PCF",
     "canonical": "gdr",
     "year": 2014,
     "lrgen_raw": 1.75,
-    "score": -6.5
+    "score": -6.5,
+    "lrecon_raw": 1.167,
+    "score_lrecon": -7.667,
+    "galtan_raw": 3.909,
+    "score_galtan": -2.182
   },
   {
     "ches_name": "PG",
     "canonical": "lfi",
     "year": 2014,
     "lrgen_raw": 1.7,
-    "score": -6.6
+    "score": -6.6,
+    "lrecon_raw": 1.111,
+    "score_lrecon": -7.778,
+    "galtan_raw": 2.4,
+    "score_galtan": -5.2
   },
   {
     "ches_name": "PRG",
     "canonical": "prg",
     "year": 2014,
     "lrgen_raw": 3.818,
-    "score": -2.364
+    "score": -2.364,
+    "lrecon_raw": 3.75,
+    "score_lrecon": -2.5,
+    "galtan_raw": 3.417,
+    "score_galtan": -3.167
   },
   {
     "ches_name": "PRV",
     "canonical": null,
     "year": 2014,
     "lrgen_raw": 6.143,
-    "score": 2.286
+    "score": 2.286,
+    "lrecon_raw": 6.5,
+    "score_lrecon": 3.0,
+    "galtan_raw": 5.857,
+    "score_galtan": 1.714
   },
   {
     "ches_name": "PS",
     "canonical": "ps",
     "year": 2014,
     "lrgen_raw": 3.833,
-    "score": -2.333
+    "score": -2.333,
+    "lrecon_raw": 3.833,
+    "score_lrecon": -2.333,
+    "galtan_raw": 3.364,
+    "score_galtan": -3.273
   },
   {
     "ches_name": "UMP",
     "canonical": "lr",
     "year": 2014,
     "lrgen_raw": 7.667,
-    "score": 5.333
+    "score": 5.333,
+    "lrecon_raw": 7.333,
+    "score_lrecon": 4.667,
+    "galtan_raw": 7.167,
+    "score_galtan": 4.333
   },
   {
     "ches_name": "DLF",
     "canonical": null,
     "year": 2019,
     "lrgen_raw": 9.0,
-    "score": 8.0
+    "score": 8.0,
+    "lrecon_raw": 7.0,
+    "score_lrecon": 4.0,
+    "galtan_raw": 8.286,
+    "score_galtan": 6.571
   },
   {
     "ches_name": "EELV",
     "canonical": "eelv",
     "year": 2019,
     "lrgen_raw": 2.5,
-    "score": -5.0
+    "score": -5.0,
+    "lrecon_raw": 2.875,
+    "score_lrecon": -4.25,
+    "galtan_raw": 1.625,
+    "score_galtan": -6.75
   },
   {
     "ches_name": "FI",
     "canonical": "lfi",
     "year": 2019,
     "lrgen_raw": 1.25,
-    "score": -7.5
+    "score": -7.5,
+    "lrecon_raw": 0.875,
+    "score_lrecon": -8.25,
+    "galtan_raw": 3.125,
+    "score_galtan": -3.75
   },
   {
     "ches_name": "LR",
     "canonical": "lr",
     "year": 2019,
     "lrgen_raw": 7.875,
-    "score": 5.75
+    "score": 5.75,
+    "lrecon_raw": 8.125,
+    "score_lrecon": 6.25,
+    "galtan_raw": 6.875,
+    "score_galtan": 3.75
   },
   {
     "ches_name": "LREM",
     "canonical": "renaissance",
     "year": 2019,
     "lrgen_raw": 6.333,
-    "score": 2.667
+    "score": 2.667,
+    "lrecon_raw": 6.333,
+    "score_lrecon": 2.667,
+    "galtan_raw": 3.167,
+    "score_galtan": -3.667
   },
   {
     "ches_name": "MoDem",
     "canonical": "modem",
     "year": 2019,
     "lrgen_raw": 6.125,
-    "score": 2.25
+    "score": 2.25,
+    "lrecon_raw": 6.25,
+    "score_lrecon": 2.5,
+    "galtan_raw": 4.5,
+    "score_galtan": -1.0
   },
   {
     "ches_name": "PCF",
     "canonical": "gdr",
     "year": 2019,
     "lrgen_raw": 1.125,
-    "score": -7.75
+    "score": -7.75,
+    "lrecon_raw": 1.125,
+    "score_lrecon": -7.75,
+    "galtan_raw": 3.75,
+    "score_galtan": -2.5
   },
   {
     "ches_name": "PS",
     "canonical": "ps",
     "year": 2019,
     "lrgen_raw": 3.0,
-    "score": -4.0
+    "score": -4.0,
+    "lrecon_raw": 3.125,
+    "score_lrecon": -3.75,
+    "galtan_raw": 2.75,
+    "score_galtan": -4.5
   },
   {
     "ches_name": "RN",
     "canonical": "rn",
     "year": 2019,
     "lrgen_raw": 9.75,
-    "score": 9.5
+    "score": 9.5,
+    "lrecon_raw": 6.875,
+    "score_lrecon": 3.75,
+    "galtan_raw": 8.125,
+    "score_galtan": 6.25
   },
   {
     "ches_name": "FI",
     "canonical": "lfi",
     "year": 2024,
     "lrgen_raw": 0.818,
-    "score": -8.364
+    "score": -8.364,
+    "lrecon_raw": 0.909,
+    "score_lrecon": -8.182,
+    "galtan_raw": 1.818,
+    "score_galtan": -6.364
   },
   {
     "ches_name": "Horizons",
     "canonical": "horizons",
     "year": 2024,
     "lrgen_raw": 6.6,
-    "score": 3.2
+    "score": 3.2,
+    "lrecon_raw": 6.8,
+    "score_lrecon": 3.6,
+    "galtan_raw": 5.3,
+    "score_galtan": 0.6
   },
   {
     "ches_name": "LE/EELV",
     "canonical": "eelv",
     "year": 2024,
     "lrgen_raw": 2.3,
-    "score": -5.4
+    "score": -5.4,
+    "lrecon_raw": 2.3,
+    "score_lrecon": -5.4,
+    "galtan_raw": 1.7,
+    "score_galtan": -6.6
   },
   {
     "ches_name": "LR",
     "canonical": "lr",
     "year": 2024,
     "lrgen_raw": 7.727,
-    "score": 5.455
+    "score": 5.455,
+    "lrecon_raw": 7.818,
+    "score_lrecon": 5.636,
+    "galtan_raw": 7.182,
+    "score_galtan": 4.364
   },
   {
     "ches_name": "MoDem",
     "canonical": "modem",
     "year": 2024,
     "lrgen_raw": 5.364,
-    "score": 0.727
+    "score": 0.727,
+    "lrecon_raw": 5.7,
+    "score_lrecon": 1.4,
+    "galtan_raw": 4.5,
+    "score_galtan": -1.0
   },
   {
     "ches_name": "PCF",
     "canonical": "gdr",
     "year": 2024,
     "lrgen_raw": 1.727,
-    "score": -6.545
+    "score": -6.545,
+    "lrecon_raw": 1.273,
+    "score_lrecon": -7.455,
+    "galtan_raw": 3.545,
+    "score_galtan": -2.909
   },
   {
     "ches_name": "PS",
     "canonical": "ps",
     "year": 2024,
     "lrgen_raw": 3.455,
-    "score": -3.091
+    "score": -3.091,
+    "lrecon_raw": 3.364,
+    "score_lrecon": -3.273,
+    "galtan_raw": 2.727,
+    "score_galtan": -4.545
   },
   {
     "ches_name": "RE",
     "canonical": "renaissance",
     "year": 2024,
     "lrgen_raw": 6.273,
-    "score": 2.545
+    "score": 2.545,
+    "lrecon_raw": 6.182,
+    "score_lrecon": 2.364,
+    "galtan_raw": 4.091,
+    "score_galtan": -1.818
   },
   {
     "ches_name": "REC",
     "canonical": null,
     "year": 2024,
     "lrgen_raw": 9.727,
-    "score": 9.455
+    "score": 9.455,
+    "lrecon_raw": 8.333,
+    "score_lrecon": 6.667,
+    "galtan_raw": 9.1,
+    "score_galtan": 8.2
   },
   {
     "ches_name": "RN",
     "canonical": "rn",
     "year": 2024,
     "lrgen_raw": 8.818,
-    "score": 7.636
+    "score": 7.636,
+    "lrecon_raw": 6.0,
+    "score_lrecon": 2.0,
+    "galtan_raw": 8.364,
+    "score_galtan": 6.727
   }
 ]

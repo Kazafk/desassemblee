@@ -49,8 +49,12 @@ CHES_TO_CANONICAL = {
     # Exclure : MPF, DLF, REC (Reconquête), Ensemble (liste européenne)
 }
 
-# Variable gauche-droite générale dans CHES
+# Axes CHES extraits (échelle 0-10, normalisés vers [-10,+10]) :
+#   lrgen  — gauche-droite générale
+#   lrecon — gauche-droite économique (redistribution, marché)
+#   galtan — GAL/TAN sociétal (libertaire/vert vs autoritaire/national)
 LR_VARIABLE = "lrgen"
+AXIS_VARIABLES = ["lrgen", "lrecon", "galtan"]
 
 
 def load_ches() -> pd.DataFrame:
@@ -84,6 +88,10 @@ def extract_france(df: pd.DataFrame) -> list[dict]:
 
     france = france.dropna(subset=[LR_VARIABLE])
 
+    missing_axes = [a for a in AXIS_VARIABLES if a not in france.columns]
+    if missing_axes:
+        print(f"ATTENTION : axes absents du CSV : {missing_axes}", file=sys.stderr)
+
     # Colonne nom du parti
     party_col = "party"
 
@@ -93,16 +101,22 @@ def extract_france(df: pd.DataFrame) -> list[dict]:
         canonical = CHES_TO_CANONICAL.get(party_name)
 
         raw_score = float(row[LR_VARIABLE])
-        # Normalise CHES 0-10 vers [-10, +10] : score = (lrgen - 5) * 2
-        calibrated = round((raw_score - 5.0) * 2.0, 3)
-
-        results.append({
+        entry = {
             "ches_name": party_name,
             "canonical": canonical,
             "year": int(row["year"]),
             "lrgen_raw": round(raw_score, 3),
-            "score": calibrated,
-        })
+            # Normalise CHES 0-10 vers [-10, +10] : score = (x - 5) * 2
+            "score": round((raw_score - 5.0) * 2.0, 3),
+        }
+        # Axes thématiques (mêmes normalisations), absents si NaN
+        for axis in ("lrecon", "galtan"):
+            if axis in france.columns and not pd.isna(row.get(axis)):
+                raw = float(row[axis])
+                entry[f"{axis}_raw"] = round(raw, 3)
+                entry[f"score_{axis}"] = round((raw - 5.0) * 2.0, 3)
+
+        results.append(entry)
 
     results.sort(key=lambda x: (x["year"], x["ches_name"]))
     return results

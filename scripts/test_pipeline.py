@@ -243,6 +243,16 @@ class TestDedupeEntries(unittest.TestCase):
         self.assertEqual(len(result), 2)
         self.assertEqual({e["scope"] for e in result}, {"tous", "solennels"})
 
+    def test_axes_coexistent(self):
+        entries = [
+            {"year": 2024, "score": 7.2, "source": "pca_calibrated", "scope": "tous"},
+            {"year": 2024, "score": 2.1, "source": "pca_calibrated", "scope": "tous", "axis": "lrecon"},
+            {"year": 2024, "score": 6.5, "source": "pca_calibrated", "scope": "tous", "axis": "galtan"},
+        ]
+        result = dedupe_entries(entries)
+        self.assertEqual(len(result), 3)
+        self.assertEqual({e.get("axis") for e in result}, {None, "lrecon", "galtan"})
+
     def test_calibrated_prefere_a_session_global(self):
         entries = [
             {"year": 2020, "score": -2.0, "source": "pca_session_global"},
