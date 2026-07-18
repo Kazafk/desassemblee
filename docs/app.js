@@ -10,6 +10,13 @@ const ASPECT  = 0.48; // hauteur / largeur
 let activeParties = new Set();   // slugs visibles
 let highlightedParty = null;     // slug mis en valeur par hover légende
 let cachedData = null;           // données chargées une seule fois
+let displayMode = "hybride";     // "hybride" | "votes" | "ches"
+
+const MODE_DESCRIPTIONS = {
+  hybride: "La courbe suit le comportement de vote ; les losanges ◆ marquent l'évaluation des experts (CHES). L'écart entre les deux mesure la distance entre discours et pratique parlementaire.",
+  votes:   "Positionnement mesuré uniquement par les votes à l'Assemblée nationale (ACP calibrée). Reflète la pratique, pas la communication.",
+  ches:    "Positionnement évalué par les chercheurs du Chapel Hill Expert Survey (vagues 2014, 2019, 2024). Reflète le programme et le discours.",
+};
 
 async function main() {
   let data;
@@ -37,6 +44,7 @@ async function main() {
   renderChart(data);
   renderLegend(data);
   setupToggleAll(data);
+  setupModeSelector(data);
 }
 
 // ── Rendu du graphique ──────────────────────────────────────────
@@ -160,72 +168,127 @@ function renderChart(data) {
     .curve(d3.curveMonotoneX)
     .defined(d => d.ci != null && d.score != null);
 
-  // ── Rendu des courbes par parti
+  // Générateur de losange pour les ancres CHES
+  const diamond = d3.symbol().type(d3.symbolDiamond).size(52);
+
+  function attachTooltip(sel, party, pt) {
+    sel
+      .on("mouseenter", (event) => {
+        const sourceLabel = {
+          ches_anchor:         "Ancre CHES ◆",
+          pca_calibrated:      "ACP calibrée ●",
+          pca_session_global:  "ACP (session) ●",
+        }[pt.source] || pt.source;
+
+        tooltip.innerHTML = `
+          <div class="tooltip-party">${party.name_short}</div>
+          <div class="tooltip-score" style="color:${party.color}">${pt.score > 0 ? "+" : ""}${pt.score.toFixed(1)}</div>
+          <div class="tooltip-meta">${pt.year} · ${sourceLabel}</div>
+          ${pt.r2 != null ? `<div class="tooltip-meta">r²&nbsp;=&nbsp;${pt.r2.toFixed(2)}</div>` : ""}
+          ${pt.ci ? `<div class="tooltip-meta">IC&nbsp;95&nbsp;% : [${pt.ci[0].toFixed(1)}, ${pt.ci[1].toFixed(1)}]</div>` : ""}
+        `;
+        positionTooltip(event);
+        tooltip.classList.add("visible");
+        tooltip.setAttribute("aria-hidden", "false");
+      })
+      .on("mousemove", positionTooltip)
+      .on("mouseleave", () => {
+        tooltip.classList.remove("visible");
+        tooltip.setAttribute("aria-hidden", "true");
+      });
+  }
+
+  // ── Rendu des courbes par parti (selon le mode d'affichage)
   data.parties.forEach(party => {
     const sorted = [...party.scores].sort((a, b) => a.year - b.year);
+    const pcaSeries  = sorted.filter(d => d.source.startsWith("pca"));
+    const chesSeries = sorted.filter(d => d.source === "ches_anchor");
     const visible = activeParties.has(party.slug);
 
-    // Bande de confiance (sous la ligne, si ≥ 2 points avec IC)
-    if (sorted.filter(d => d.ci).length >= 2) {
+    // La ligne suit les votes (modes hybride/votes) ou les ancres CHES (mode experts)
+    const lineData = displayMode === "ches" ? chesSeries : pcaSeries;
+    const showBand     = displayMode !== "ches";
+    const showPcaDots  = displayMode !== "ches";
+    const showChesDots = displayMode !== "votes";
+
+    // Bande de confiance (uniquement sur les scores de votes)
+    if (showBand && pcaSeries.filter(d => d.ci).length >= 2) {
       g.append("path")
-        .datum(sorted)
+        .datum(pcaSeries)
         .attr("class", `party-band party-band-${party.slug}`)
         .attr("fill", party.color)
         .attr("opacity", visible ? 0.10 : 0.015)
         .attr("d", bandGen);
     }
 
-    // Ligne principale
-    const path = g.append("path")
-      .datum(sorted)
-      .attr("class", `party-line party-${party.slug}`)
-      .attr("stroke", party.color)
-      .attr("opacity", visible ? 1 : 0.08)
-      .attr("d", lineGen);
-
-    // Animation d'entrée stroke-dashoffset
-    animateLine(path);
-
-    // Points de données
-    sorted.forEach(pt => {
-      const symbol = pt.source === "ches_anchor" ? "◆" : "●";
-      const radius = pt.source === "ches_anchor" ? 5 : 3.5;
-
-      const dot = g.append("circle")
-        .attr("class", `party-dot party-dot-${party.slug}`)
-        .attr("cx", xScale(pt.year))
-        .attr("cy", yScale(pt.score))
-        .attr("r", radius)
-        .attr("fill", party.color)
+    // Ligne principale (pointillée en mode experts : points épars)
+    if (lineData.length >= 2) {
+      const path = g.append("path")
+        .datum(lineData)
+        .attr("class", `party-line party-${party.slug}`)
+        .attr("stroke", party.color)
         .attr("opacity", visible ? 1 : 0.08)
-        .attr("stroke", pt.source === "ches_anchor" ? "white" : "none")
-        .attr("stroke-width", 1.5);
+        .attr("d", lineGen);
 
-      // Tooltip
-      dot
-        .on("mouseenter", (event) => {
-          const sourceLabel = {
-            ches_anchor:         "Ancre CHES ◆",
-            pca_calibrated:      "ACP calibrée ●",
-            pca_session_global:  "ACP (session) ●",
-          }[pt.source] || pt.source;
+      if (displayMode === "ches") {
+        path.attr("stroke-dasharray", "6 4").attr("stroke-width", 1.6);
+      } else {
+        animateLine(path);
+      }
+    }
 
-          tooltip.innerHTML = `
-            <div class="tooltip-party">${party.name_short}</div>
-            <div class="tooltip-score" style="color:${party.color}">${pt.score > 0 ? "+" : ""}${pt.score.toFixed(1)}</div>
-            <div class="tooltip-meta">${pt.year} · ${sourceLabel}</div>
-            ${pt.r2 != null ? `<div class="tooltip-meta">r²&nbsp;=&nbsp;${pt.r2.toFixed(2)}</div>` : ""}
-            ${pt.ci ? `<div class="tooltip-meta">IC&nbsp;95&nbsp;% : [${pt.ci[0].toFixed(1)}, ${pt.ci[1].toFixed(1)}]</div>` : ""}
-          `;
-          positionTooltip(event);
-          tooltip.classList.add("visible");
-          tooltip.setAttribute("aria-hidden", "false");
-        })
-        .on("mousemove", positionTooltip)
-        .on("mouseleave", () => {
-          tooltip.classList.remove("visible");
-          tooltip.setAttribute("aria-hidden", "true");
-        });
+    // Points ACP ●
+    if (showPcaDots) {
+      pcaSeries.forEach(pt => {
+        const dot = g.append("circle")
+          .attr("class", `party-dot party-dot-${party.slug}`)
+          .attr("cx", xScale(pt.year))
+          .attr("cy", yScale(pt.score))
+          .attr("r", 3.5)
+          .attr("fill", party.color)
+          .attr("opacity", visible ? 1 : 0.08);
+        attachTooltip(dot, party, pt);
+      });
+    }
+
+    // Ancres CHES ◆ (losanges — flottent hors de la courbe en mode hybride)
+    if (showChesDots) {
+      chesSeries.forEach(pt => {
+        const mark = g.append("path")
+          .attr("class", `party-dot party-dot-${party.slug}`)
+          .attr("d", diamond())
+          .attr("transform", `translate(${xScale(pt.year)},${yScale(pt.score)})`)
+          .attr("fill", party.color)
+          .attr("stroke", "white")
+          .attr("stroke-width", 1.2)
+          .attr("opacity", visible ? 1 : 0.08);
+        attachTooltip(mark, party, pt);
+      });
+    }
+  });
+}
+
+// ── Sélecteur de mode (Hybride / Votes / Experts) ───────────────
+
+function setupModeSelector(data) {
+  const container = document.getElementById("modeSelector");
+  const description = document.getElementById("modeDescription");
+  if (!container) return;
+
+  description.textContent = MODE_DESCRIPTIONS[displayMode];
+
+  container.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.mode === displayMode);
+    btn.setAttribute("aria-selected", String(btn.dataset.mode === displayMode));
+    btn.addEventListener("click", () => {
+      if (btn.dataset.mode === displayMode) return;
+      displayMode = btn.dataset.mode;
+      container.querySelectorAll(".mode-btn").forEach(b => {
+        b.classList.toggle("active", b === btn);
+        b.setAttribute("aria-selected", String(b === btn));
+      });
+      description.textContent = MODE_DESCRIPTIONS[displayMode];
+      renderChart(data);
     });
   });
 }

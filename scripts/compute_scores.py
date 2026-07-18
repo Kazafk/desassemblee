@@ -349,6 +349,26 @@ def compute_session_scores(
     return dict(results)
 
 
+def dedupe_entries(entries: list[dict]) -> list[dict]:
+    """
+    Conserve UNE entrée par couple (année, famille de source), où la famille
+    est "ches" (ancre d'experts) ou "pca" (mesure par les votes).
+
+    Les deux familles coexistent pour une même année : le front-end choisit
+    ensuite le mode d'affichage (votes seuls, CHES seul, ou hybride).
+    Au sein de la famille pca : pca_calibrated > pca_session_global.
+    """
+    FAMILY = {"ches_anchor": "ches", "pca_calibrated": "pca", "pca_session_global": "pca"}
+    PRIORITY = {"ches_anchor": 0, "pca_calibrated": 0, "pca_session_global": 1}
+
+    seen: dict[tuple[int, str], dict] = {}
+    for entry in entries:
+        key = (entry["year"], FAMILY.get(entry["source"], "pca"))
+        if key not in seen or PRIORITY.get(entry["source"], 9) < PRIORITY.get(seen[key]["source"], 9):
+            seen[key] = entry
+    return sorted(seen.values(), key=lambda x: (x["year"], x["source"]))
+
+
 def main() -> None:
     if not CHES_FILE.exists():
         print(f"ERREUR : {CHES_FILE} introuvable — lance d'abord fetch_ches.py")
@@ -371,14 +391,7 @@ def main() -> None:
 
     # Dédupliquer et trier par année
     for canon in all_scores:
-        seen_years: dict[int, dict] = {}
-        for entry in all_scores[canon]:
-            y = entry["year"]
-            # Préférer ches_anchor > pca_calibrated > pca_session_global
-            priority = {"ches_anchor": 0, "pca_calibrated": 1, "pca_session_global": 2}
-            if y not in seen_years or priority.get(entry["source"], 9) < priority.get(seen_years[y]["source"], 9):
-                seen_years[y] = entry
-        all_scores[canon] = sorted(seen_years.values(), key=lambda x: x["year"])
+        all_scores[canon] = dedupe_entries(all_scores[canon])
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(dict(all_scores), ensure_ascii=False, indent=2), encoding="utf-8")

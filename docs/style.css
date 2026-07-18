@@ -91,8 +91,49 @@ h1 {
 .chart-controls {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 0.75rem;
+}
+
+.mode-selector {
+  display: inline-flex;
+  border: 1px solid var(--rule);
+}
+
+.mode-btn {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: transparent;
+  border: none;
+  color: var(--ink-light);
+  padding: 0.3rem 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mode-btn + .mode-btn {
+  border-left: 1px solid var(--rule);
+}
+
+.mode-btn:hover {
+  color: var(--ink);
+}
+
+.mode-btn.active {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.mode-description {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink-light);
+  margin: 0 0 0.75rem;
+  min-height: 1.4em;
 }
 
 .btn-toggle-all {

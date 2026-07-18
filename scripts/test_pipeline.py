@@ -18,6 +18,7 @@ from compute_scores import (
     bootstrap_ci,
     calibrate,
     canonicalize,
+    dedupe_entries,
     get_ches_scores_for_session,
     slugs_for_session,
 )
@@ -209,6 +210,43 @@ class TestBootstrapCI(unittest.TestCase):
 
     def test_matrice_trop_petite_retourne_vide(self):
         self.assertEqual(bootstrap_ci(np.zeros((3, 5)), ["a", "b", "c"], {}, {}), {})
+
+
+class TestDedupeEntries(unittest.TestCase):
+    def test_ches_et_pca_coexistent_pour_une_meme_annee(self):
+        # Cas PS 2024 : ancre CHES (-3.1) ET mesure par les votes (-6.0)
+        entries = [
+            {"year": 2024, "score": -6.0, "source": "pca_calibrated"},
+            {"year": 2024, "score": -3.1, "source": "ches_anchor"},
+        ]
+        result = dedupe_entries(entries)
+        self.assertEqual(len(result), 2)
+        self.assertEqual({e["source"] for e in result}, {"pca_calibrated", "ches_anchor"})
+
+    def test_calibrated_prefere_a_session_global(self):
+        entries = [
+            {"year": 2020, "score": -2.0, "source": "pca_session_global"},
+            {"year": 2020, "score": -2.5, "source": "pca_calibrated"},
+        ]
+        result = dedupe_entries(entries)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["source"], "pca_calibrated")
+
+    def test_doublon_meme_source_garde_un_seul(self):
+        # Ancre CHES 2024 émise par les sessions 16 ET 17
+        entries = [
+            {"year": 2024, "score": -3.1, "source": "ches_anchor"},
+            {"year": 2024, "score": -3.1, "source": "ches_anchor"},
+        ]
+        self.assertEqual(len(dedupe_entries(entries)), 1)
+
+    def test_tri_par_annee(self):
+        entries = [
+            {"year": 2022, "score": 1.0, "source": "pca_calibrated"},
+            {"year": 2020, "score": 2.0, "source": "pca_calibrated"},
+        ]
+        result = dedupe_entries(entries)
+        self.assertEqual([e["year"] for e in result], [2020, 2022])
 
 
 class TestSessionYears(unittest.TestCase):

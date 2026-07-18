@@ -28,9 +28,15 @@
 
       <section class="chart-section">
         <div class="chart-controls">
+          <div class="mode-selector" id="modeSelector" role="tablist" aria-label="Source des scores">
+            <button class="mode-btn active" data-mode="hybride" role="tab" aria-selected="true">Hybride</button>
+            <button class="mode-btn" data-mode="votes" role="tab" aria-selected="false">Votes</button>
+            <button class="mode-btn" data-mode="ches" role="tab" aria-selected="false">Experts</button>
+          </div>
           <button class="btn-toggle-all" id="toggleAll">Tout afficher</button>
           <span class="chart-hint">Cliquez sur un parti pour le mettre en valeur</span>
         </div>
+        <p class="mode-description" id="modeDescription"></p>
         <div class="chart-container" id="chart"></div>
         <div class="chart-legend" id="legend"></div>
       </section>
@@ -42,13 +48,13 @@
             Méthodologie
           </summary>
           <div class="method-body">
-            <p><strong>Comment ce score est-il calculé ?</strong> À partir des votes à l'Assemblée nationale (sessions 14 à 17), on construit une matrice de votes <em>(groupes&thinsp;×&thinsp;scrutins)</em> encodant +1&thinsp;(pour), −1&thinsp;(contre), 0&thinsp;(abstention). Une analyse en composantes principales (ACP) en extrait le premier axe, qui capture empiriquement le clivage gauche-droite.</p>
-            <p>Les scores sont <strong>calibrés sur le Chapel Hill Expert Survey</strong> (CHES, chesdata.eu) — une enquête académique bisannuelle où des chercheurs en science politique notent les partis sur un axe 0–10. Cette calibration ancre l'ACP sur une référence indépendante de toute auto-déclaration partisane.</p>
-            <p><strong>Sources :</strong> <a href="https://api.clair.vote" target="_blank">API CLAIR</a> (votes AN) · <a href="https://chesdata.eu" target="_blank">Chapel Hill Expert Survey 2023</a></p>
+            <p><strong>Comment ce score est-il calculé ?</strong> À partir des votes à l'Assemblée nationale (législatures 14 à 17, open data officiel), on construit une matrice de votes <em>(groupes&thinsp;×&thinsp;scrutins)</em> encodant +1&thinsp;(pour), −1&thinsp;(contre), 0&thinsp;(abstention). Une analyse en composantes principales (ACP) à deux composantes en extrait le plan des clivages dominants.</p>
+            <p>Les scores sont <strong>calibrés sur le Chapel Hill Expert Survey</strong> (CHES, chesdata.eu) — une enquête académique bisannuelle où des chercheurs en science politique notent les partis sur un axe 0–10. Une régression bivariée sélectionne, dans le plan factoriel, la direction correspondant à l'axe gauche-droite académique. Les bandes translucides matérialisent l'incertitude (bootstrap, IC à 95&thinsp;%).</p>
+            <p><strong>Trois lectures possibles :</strong> le mode <em>Votes</em> montre le comportement parlementaire réel (un parti peut voter plus à gauche ou à droite que son discours) ; le mode <em>Experts</em> montre le positionnement programmatique évalué par le CHES (vagues 2014, 2019, 2024) ; le mode <em>Hybride</em> suit les votes en continu et affiche les ancres d'experts en losanges — l'écart entre les deux est une information en soi.</p>
+            <p><strong>Sources :</strong> <a href="https://data.assemblee-nationale.fr" target="_blank">Open data Assemblée nationale</a> (scrutins) · <a href="https://chesdata.eu" target="_blank">Chapel Hill Expert Survey</a> (vagues 2014-2024)</p>
             <ul class="legend-sources">
               <li><span class="dot ches">◆</span> Ancre CHES (enquête académique)</li>
               <li><span class="dot pca">●</span> Score ACP calibré (votes réels)</li>
-              <li><span class="dot interp">○</span> Score interpolé</li>
             </ul>
           </div>
         </details>
@@ -61,7 +67,7 @@
       <p class="footer-text">
         <span id="updateDate"></span>
         &ensp;·&ensp;
-        Données : <a href="https://api.clair.vote" target="_blank">API CLAIR</a> &amp; <a href="https://chesdata.eu" target="_blank">CHES 2023</a>
+        Données : <a href="https://data.assemblee-nationale.fr" target="_blank">Open data AN</a> &amp; <a href="https://chesdata.eu" target="_blank">CHES</a>
         &ensp;·&ensp;
         Code : <a href="https://github.com/Kazafk/desassemblee" target="_blank">github.com/Kazafk/desassemblee</a>
       </p>
