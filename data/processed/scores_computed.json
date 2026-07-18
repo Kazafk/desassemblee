@@ -749,28 +749,6 @@
   ],
   "udi": [
     {
-      "year": 2012,
-      "score": 10.0,
-      "source": "pca_calibrated",
-      "r2": 0.949,
-      "n_scrutins": 82,
-      "ci": [
-        8.22,
-        10.0
-      ]
-    },
-    {
-      "year": 2013,
-      "score": 10.0,
-      "source": "pca_calibrated",
-      "r2": 0.958,
-      "n_scrutins": 676,
-      "ci": [
-        10.0,
-        10.0
-      ]
-    },
-    {
       "year": 2014,
       "score": 6.08,
       "source": "pca_calibrated",
@@ -799,7 +777,7 @@
       "r2": 0.977,
       "n_scrutins": 144,
       "ci": [
-        7.43,
+        7.28,
         10.0
       ]
     },

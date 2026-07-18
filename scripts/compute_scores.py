@@ -28,6 +28,12 @@ OUT = ROOT / "data" / "processed" / "scores_computed.json"
 # Nombre de rééchantillonnages bootstrap pour les intervalles de confiance
 N_BOOTSTRAP = 200
 
+# Tolérance de dépassement d'échelle : un score projeté dans [-11, +11] est
+# clippé à [-10, +10] (bruit de calibration) ; au-delà, le point est EXCLU —
+# l'extrapolation est sortie du domaine où la régression est valide
+# (ex. UDI 2012 sans ancre CHES, projeté très au-delà de +10).
+CLIP_TOLERANCE = 1.0
+
 
 def load_vote_matrix(session: str) -> tuple[list[str], list[str], np.ndarray]:
     """
@@ -131,11 +137,8 @@ def calibrate(pca_dict: dict, ches_scores: dict[str, float], verbose: bool = Tru
             print(f"    Calibration CHES (bivariée) : r²={r2:.3f} sur {len(common_slugs)} partis communs")
             if r2 < 0.5:
                 print(f"    ATTENTION : r²={r2:.3f} < 0.5, calibration peu fiable")
-        calibrated = {
-            g: float(np.clip(np.dot(np.append(v, 1.0), coef), -10, 10))
-            for g, v in vec.items()
-        }
-        return calibrated, r2
+        raw = {g: float(np.dot(np.append(v, 1.0), coef)) for g, v in vec.items()}
+        return _clip_or_drop(raw, verbose), r2
 
     elif len(common_slugs) == 2:
         x = np.array([vec[s][0] for s in common_slugs])
@@ -146,15 +149,31 @@ def calibrate(pca_dict: dict, ches_scores: dict[str, float], verbose: bool = Tru
         r2 = r ** 2
         if verbose:
             print(f"    Calibration CHES (1D, 2 partis) : r²={r2:.3f}")
-        calibrated = {
-            g: float(np.clip(slope * v[0] + intercept, -10, 10)) for g, v in vec.items()
-        }
-        return calibrated, r2
+        raw = {g: float(slope * v[0] + intercept) for g, v in vec.items()}
+        return _clip_or_drop(raw, verbose), r2
 
     else:
         if verbose:
             print(f"    Calibration CHES impossible ({len(common_slugs)} partis communs), normalisation [-10,+10]")
         return fallback_minmax()
+
+
+def _clip_or_drop(raw: dict[str, float], verbose: bool = True) -> dict[str, float]:
+    """
+    Applique la règle de bornage : clip dans la marge de tolérance,
+    exclusion au-delà (extrapolation hors du domaine de calibration).
+    """
+    result: dict[str, float] = {}
+    dropped: list[str] = []
+    for g, v in raw.items():
+        if abs(v) > 10 + CLIP_TOLERANCE:
+            dropped.append(g)
+        else:
+            result[g] = float(np.clip(v, -10, 10))
+    if dropped and verbose:
+        print(f"    Exclus (score hors [-{10 + CLIP_TOLERANCE:.0f}, +{10 + CLIP_TOLERANCE:.0f}], "
+              f"extrapolation non fiable) : {sorted(dropped)}")
+    return result
 
 
 def canonicalize(raw: dict, api_to_canonical: dict[str, str | None]) -> dict:

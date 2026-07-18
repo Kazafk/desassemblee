@@ -51,11 +51,22 @@ class TestCalibrate(unittest.TestCase):
         calibrated, _ = calibrate(pca, ches, verbose=False)
         self.assertAlmostEqual(calibrated["inconnu"], 2.5, places=6)
 
-    def test_clip_aux_bornes(self):
+    def test_clip_dans_la_marge_de_tolerance(self):
+        # Projection à ~10.5 (dans [-11, +11]) : clippée à 10, pas exclue
+        pca = {"a": -1.0, "b": 1.0, "borderline": 1.167}
+        ches = {"a": -9.0, "b": 9.0}
+        calibrated, _ = calibrate(pca, ches, verbose=False)
+        self.assertEqual(calibrated["borderline"], 10.0)
+
+    def test_exclusion_hors_domaine(self):
+        # Projection très au-delà de la tolérance : le point est exclu
+        # (cas UDI 2012 : extrapolation sans ancre CHES hors échelle)
         pca = {"a": -1.0, "b": 1.0, "extreme": 100.0}
         ches = {"a": -9.0, "b": 9.0}
         calibrated, _ = calibrate(pca, ches, verbose=False)
-        self.assertEqual(calibrated["extreme"], 10.0)
+        self.assertNotIn("extreme", calibrated)
+        self.assertIn("a", calibrated)
+        self.assertIn("b", calibrated)
 
     def test_fallback_normalisation_sans_ches(self):
         pca = {"a": 2.0, "b": 4.0, "c": 6.0}
