@@ -1,6 +1,6 @@
 {
   "meta": {
-    "updated": "2026-08-10",
+    "updated": "2026-08-17",
     "sources": [
       "API CLAIR — votes AN (sessions 14-17)",
       "Chapel Hill Expert Survey, vagues 2014/2019/2024 (chesdata.eu)"
@@ -2182,7 +2182,7 @@
           "r2": 0.94,
           "n_scrutins": 3487,
           "ci": [
-            -5.47,
+            -5.46,
             -5.25
           ]
         },
