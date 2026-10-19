@@ -455,8 +455,8 @@
       "scope": "solennels",
       "r2": 0.925,
       "ci": [
-        -6.95,
-        -6.22
+        -6.87,
+        -6.2
       ]
     },
     {
@@ -515,48 +515,48 @@
       "source": "pca_calibrated",
       "scope": "solennels",
       "r2": 0.91,
-      "n_scrutins": 45,
+      "n_scrutins": 47,
       "ci": [
         -7.0,
-        -6.14
+        -6.17
       ]
     },
     {
       "year": 2026,
-      "score": -6.71,
+      "score": -6.68,
       "source": "pca_calibrated",
       "scope": "tous",
       "r2": 0.944,
-      "n_scrutins": 3725,
+      "n_scrutins": 3930,
       "ci": [
-        -6.78,
-        -6.64
+        -6.75,
+        -6.62
       ]
     },
     {
       "year": 2026,
-      "score": -5.75,
+      "score": -5.74,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.97,
-      "n_scrutins": 3725,
+      "r2": 0.968,
+      "n_scrutins": 3930,
       "axis": "galtan",
       "ci": [
-        -5.81,
-        -5.69
+        -5.8,
+        -5.68
       ]
     },
     {
       "year": 2026,
-      "score": -6.99,
+      "score": -6.94,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.91,
-      "n_scrutins": 3725,
+      "r2": 0.911,
+      "n_scrutins": 3930,
       "axis": "lrecon",
       "ci": [
-        -7.06,
-        -6.91
+        -7.0,
+        -6.86
       ]
     }
   ],
@@ -1261,13 +1261,13 @@
     },
     {
       "year": 2024,
-      "score": -6.2,
+      "score": -6.21,
       "source": "pca_session_global",
       "scope": "solennels",
       "r2": 0.925,
       "ci": [
-        -6.58,
-        -5.69
+        -6.51,
+        -5.72
       ]
     },
     {
@@ -1322,52 +1322,52 @@
     },
     {
       "year": 2026,
-      "score": -6.07,
+      "score": -6.08,
       "source": "pca_calibrated",
       "scope": "solennels",
       "r2": 0.91,
-      "n_scrutins": 45,
+      "n_scrutins": 47,
       "ci": [
-        -6.63,
-        -5.2
+        -6.68,
+        -5.17
       ]
     },
     {
       "year": 2026,
-      "score": -4.76,
+      "score": -4.81,
       "source": "pca_calibrated",
       "scope": "tous",
       "r2": 0.944,
-      "n_scrutins": 3725,
+      "n_scrutins": 3930,
       "ci": [
-        -4.94,
-        -4.61
+        -4.95,
+        -4.68
       ]
     },
     {
       "year": 2026,
-      "score": -4.48,
+      "score": -4.49,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.97,
-      "n_scrutins": 3725,
+      "r2": 0.968,
+      "n_scrutins": 3930,
       "axis": "galtan",
       "ci": [
         -4.59,
-        -4.34
+        -4.38
       ]
     },
     {
       "year": 2026,
-      "score": -5.0,
+      "score": -5.08,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.91,
-      "n_scrutins": 3725,
+      "r2": 0.911,
+      "n_scrutins": 3930,
       "axis": "lrecon",
       "ci": [
-        -5.19,
-        -4.84
+        -5.26,
+        -4.93
       ]
     }
   ],
@@ -2077,8 +2077,8 @@
       "scope": "solennels",
       "r2": 0.925,
       "ci": [
-        4.38,
-        6.05
+        4.48,
+        6.03
       ]
     },
     {
@@ -2133,51 +2133,51 @@
     },
     {
       "year": 2026,
-      "score": 5.16,
+      "score": 5.13,
       "source": "pca_calibrated",
       "scope": "solennels",
       "r2": 0.91,
-      "n_scrutins": 45,
+      "n_scrutins": 47,
       "ci": [
-        4.08,
-        6.06
+        4.15,
+        6.08
       ]
     },
     {
       "year": 2026,
-      "score": 5.98,
+      "score": 5.92,
       "source": "pca_calibrated",
       "scope": "tous",
       "r2": 0.944,
-      "n_scrutins": 3725,
+      "n_scrutins": 3930,
       "ci": [
-        5.88,
-        6.11
+        5.81,
+        6.04
       ]
     },
     {
       "year": 2026,
-      "score": 4.31,
+      "score": 4.22,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.97,
-      "n_scrutins": 3725,
+      "r2": 0.968,
+      "n_scrutins": 3930,
       "axis": "galtan",
       "ci": [
-        4.14,
-        4.47
+        4.07,
+        4.38
       ]
     },
     {
       "year": 2026,
-      "score": 3.82,
+      "score": 3.81,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.91,
-      "n_scrutins": 3725,
+      "r2": 0.911,
+      "n_scrutins": 3930,
       "axis": "lrecon",
       "ci": [
-        3.75,
+        3.74,
         3.9
       ]
     }
@@ -3155,13 +3155,13 @@
     },
     {
       "year": 2024,
-      "score": -4.94,
+      "score": -4.92,
       "source": "pca_session_global",
       "scope": "solennels",
       "r2": 0.925,
       "ci": [
-        -5.43,
-        -3.9
+        -5.44,
+        -4.02
       ]
     },
     {
@@ -3216,52 +3216,52 @@
     },
     {
       "year": 2026,
-      "score": -4.99,
+      "score": -4.95,
       "source": "pca_calibrated",
       "scope": "solennels",
       "r2": 0.91,
-      "n_scrutins": 45,
+      "n_scrutins": 47,
       "ci": [
-        -5.8,
-        -3.37
+        -5.78,
+        -3.31
       ]
     },
     {
       "year": 2026,
-      "score": -5.24,
+      "score": -5.31,
       "source": "pca_calibrated",
       "scope": "tous",
       "r2": 0.944,
-      "n_scrutins": 3725,
+      "n_scrutins": 3930,
       "ci": [
-        -5.36,
-        -5.11
+        -5.41,
+        -5.2
       ]
     },
     {
       "year": 2026,
-      "score": -5.07,
+      "score": -5.12,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.97,
-      "n_scrutins": 3725,
+      "r2": 0.968,
+      "n_scrutins": 3930,
       "axis": "galtan",
       "ci": [
-        -5.15,
-        -4.98
+        -5.2,
+        -5.03
       ]
     },
     {
       "year": 2026,
-      "score": -5.17,
+      "score": -5.22,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.91,
-      "n_scrutins": 3725,
+      "r2": 0.911,
+      "n_scrutins": 3930,
       "axis": "lrecon",
       "ci": [
-        -5.29,
-        -5.01
+        -5.35,
+        -5.09
       ]
     }
   ],
@@ -3868,13 +3868,13 @@
     },
     {
       "year": 2024,
-      "score": 5.66,
+      "score": 5.63,
       "source": "pca_session_global",
       "scope": "solennels",
       "r2": 0.925,
       "ci": [
-        4.64,
-        6.61
+        4.55,
+        6.35
       ]
     },
     {
@@ -3929,52 +3929,52 @@
     },
     {
       "year": 2026,
-      "score": 5.19,
+      "score": 5.15,
       "source": "pca_calibrated",
       "scope": "solennels",
       "r2": 0.91,
-      "n_scrutins": 45,
+      "n_scrutins": 47,
       "ci": [
-        3.95,
-        6.02
+        4.01,
+        6.07
       ]
     },
     {
       "year": 2026,
-      "score": 7.16,
+      "score": 7.18,
       "source": "pca_calibrated",
       "scope": "tous",
       "r2": 0.944,
-      "n_scrutins": 3725,
+      "n_scrutins": 3930,
       "ci": [
-        7.07,
-        7.24
+        7.09,
+        7.26
       ]
     },
     {
       "year": 2026,
-      "score": 6.83,
+      "score": 6.88,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.97,
-      "n_scrutins": 3725,
+      "r2": 0.968,
+      "n_scrutins": 3930,
       "axis": "galtan",
       "ci": [
-        6.73,
-        6.92
+        6.79,
+        6.96
       ]
     },
     {
       "year": 2026,
-      "score": 2.99,
+      "score": 2.94,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.91,
-      "n_scrutins": 3725,
+      "r2": 0.911,
+      "n_scrutins": 3930,
       "axis": "lrecon",
       "ci": [
-        2.9,
-        3.06
+        2.85,
+        3.01
       ]
     }
   ],
@@ -4429,13 +4429,13 @@
     },
     {
       "year": 2024,
-      "score": 3.22,
+      "score": 3.23,
       "source": "pca_session_global",
       "scope": "solennels",
       "r2": 0.925,
       "ci": [
-        2.35,
-        3.88
+        2.5,
+        3.79
       ]
     },
     {
@@ -4490,52 +4490,52 @@
     },
     {
       "year": 2026,
-      "score": 3.52,
+      "score": 3.53,
       "source": "pca_calibrated",
       "scope": "solennels",
       "r2": 0.91,
-      "n_scrutins": 45,
+      "n_scrutins": 47,
       "ci": [
-        2.7,
-        4.02
+        2.68,
+        4.03
       ]
     },
     {
       "year": 2026,
-      "score": 1.78,
+      "score": 1.76,
       "source": "pca_calibrated",
       "scope": "tous",
       "r2": 0.944,
-      "n_scrutins": 3725,
+      "n_scrutins": 3930,
       "ci": [
-        1.7,
-        1.86
+        1.67,
+        1.85
       ]
     },
     {
       "year": 2026,
-      "score": -0.98,
+      "score": -1.01,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.97,
-      "n_scrutins": 3725,
+      "r2": 0.968,
+      "n_scrutins": 3930,
       "axis": "galtan",
       "ci": [
-        -1.05,
+        -1.1,
         -0.91
       ]
     },
     {
       "year": 2026,
-      "score": 2.52,
+      "score": 2.53,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.91,
-      "n_scrutins": 3725,
+      "r2": 0.911,
+      "n_scrutins": 3930,
       "axis": "lrecon",
       "ci": [
-        2.46,
-        2.59
+        2.45,
+        2.6
       ]
     }
   ],
@@ -4990,13 +4990,13 @@
     },
     {
       "year": 2024,
-      "score": -6.48,
+      "score": -6.49,
       "source": "pca_session_global",
       "scope": "solennels",
       "r2": 0.925,
       "ci": [
-        -7.18,
-        -6.1
+        -7.16,
+        -6.13
       ]
     },
     {
@@ -5051,52 +5051,52 @@
     },
     {
       "year": 2026,
-      "score": -6.5,
+      "score": -6.53,
       "source": "pca_calibrated",
       "scope": "solennels",
       "r2": 0.91,
-      "n_scrutins": 45,
+      "n_scrutins": 47,
       "ci": [
-        -7.06,
-        -6.14
+        -7.19,
+        -6.15
       ]
     },
     {
       "year": 2026,
-      "score": -6.76,
+      "score": -6.7,
       "source": "pca_calibrated",
       "scope": "tous",
       "r2": 0.944,
-      "n_scrutins": 3725,
+      "n_scrutins": 3930,
       "ci": [
-        -6.83,
-        -6.67
+        -6.78,
+        -6.62
       ]
     },
     {
       "year": 2026,
-      "score": -5.59,
+      "score": -5.52,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.97,
-      "n_scrutins": 3725,
+      "r2": 0.968,
+      "n_scrutins": 3930,
       "axis": "galtan",
       "ci": [
-        -5.66,
-        -5.51
+        -5.59,
+        -5.44
       ]
     },
     {
       "year": 2026,
-      "score": -7.25,
+      "score": -7.22,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.91,
-      "n_scrutins": 3725,
+      "r2": 0.911,
+      "n_scrutins": 3930,
       "axis": "lrecon",
       "ci": [
-        -7.33,
-        -7.18
+        -7.3,
+        -7.14
       ]
     }
   ],
@@ -5531,13 +5531,13 @@
     },
     {
       "year": 2024,
-      "score": 2.39,
+      "score": 2.41,
       "source": "pca_session_global",
       "scope": "solennels",
       "r2": 0.925,
       "ci": [
         1.3,
-        3.39
+        3.33
       ]
     },
     {
@@ -5592,52 +5592,52 @@
     },
     {
       "year": 2026,
-      "score": 2.65,
+      "score": 2.69,
       "source": "pca_calibrated",
       "scope": "solennels",
       "r2": 0.91,
-      "n_scrutins": 45,
+      "n_scrutins": 47,
       "ci": [
-        1.53,
-        3.9
+        1.56,
+        3.77
       ]
     },
     {
       "year": 2026,
-      "score": 1.9,
+      "score": 1.96,
       "source": "pca_calibrated",
       "scope": "tous",
       "r2": 0.944,
-      "n_scrutins": 3725,
+      "n_scrutins": 3930,
       "ci": [
-        1.83,
-        1.98
+        1.91,
+        2.05
       ]
     },
     {
       "year": 2026,
-      "score": -0.95,
+      "score": -0.91,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.97,
-      "n_scrutins": 3725,
+      "r2": 0.968,
+      "n_scrutins": 3930,
       "axis": "galtan",
       "ci": [
-        -1.03,
-        -0.86
+        -0.98,
+        -0.82
       ]
     },
     {
       "year": 2026,
-      "score": 2.7,
+      "score": 2.77,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.91,
-      "n_scrutins": 3725,
+      "r2": 0.911,
+      "n_scrutins": 3930,
       "axis": "lrecon",
       "ci": [
-        2.64,
-        2.77
+        2.72,
+        2.84
       ]
     }
   ],
@@ -6037,8 +6037,8 @@
       "scope": "solennels",
       "r2": 0.925,
       "ci": [
-        1.38,
-        3.16
+        1.45,
+        3.07
       ]
     },
     {
@@ -6093,52 +6093,52 @@
     },
     {
       "year": 2026,
-      "score": 2.4,
+      "score": 2.42,
       "source": "pca_calibrated",
       "scope": "solennels",
       "r2": 0.91,
-      "n_scrutins": 45,
+      "n_scrutins": 47,
       "ci": [
-        1.16,
-        3.38
+        1.32,
+        3.36
       ]
     },
     {
       "year": 2026,
-      "score": 0.88,
+      "score": 0.93,
       "source": "pca_calibrated",
       "scope": "tous",
       "r2": 0.944,
-      "n_scrutins": 3725,
+      "n_scrutins": 3930,
       "ci": [
-        0.72,
-        1.07
+        0.77,
+        1.08
       ]
     },
     {
       "year": 2026,
-      "score": -1.39,
+      "score": -1.37,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.97,
-      "n_scrutins": 3725,
+      "r2": 0.968,
+      "n_scrutins": 3930,
       "axis": "galtan",
       "ci": [
-        -1.52,
-        -1.2
+        -1.51,
+        -1.24
       ]
     },
     {
       "year": 2026,
-      "score": 1.4,
+      "score": 1.46,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.91,
-      "n_scrutins": 3725,
+      "r2": 0.911,
+      "n_scrutins": 3930,
       "axis": "lrecon",
       "ci": [
-        1.24,
-        1.54
+        1.31,
+        1.62
       ]
     }
   ],
@@ -6303,13 +6303,13 @@
     },
     {
       "year": 2024,
-      "score": 3.94,
+      "score": 3.95,
       "source": "pca_session_global",
       "scope": "solennels",
       "r2": 0.925,
       "ci": [
-        3.35,
-        4.24
+        3.5,
+        4.21
       ]
     },
     {
@@ -6364,52 +6364,52 @@
     },
     {
       "year": 2026,
-      "score": 3.76,
+      "score": 3.78,
       "source": "pca_calibrated",
       "scope": "solennels",
       "r2": 0.91,
-      "n_scrutins": 45,
+      "n_scrutins": 47,
       "ci": [
-        3.07,
-        4.16
+        3.04,
+        4.11
       ]
     },
     {
       "year": 2026,
-      "score": 2.81,
+      "score": 2.85,
       "source": "pca_calibrated",
       "scope": "tous",
       "r2": 0.944,
-      "n_scrutins": 3725,
+      "n_scrutins": 3930,
       "ci": [
-        2.73,
-        2.9
+        2.75,
+        2.93
       ]
     },
     {
       "year": 2026,
-      "score": 0.13,
+      "score": 0.15,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.97,
-      "n_scrutins": 3725,
+      "r2": 0.968,
+      "n_scrutins": 3930,
       "axis": "galtan",
       "ci": [
-        0.03,
-        0.23
+        0.05,
+        0.24
       ]
     },
     {
       "year": 2026,
-      "score": 3.06,
+      "score": 3.1,
       "source": "pca_calibrated",
       "scope": "tous",
-      "r2": 0.91,
-      "n_scrutins": 3725,
+      "r2": 0.911,
+      "n_scrutins": 3930,
       "axis": "lrecon",
       "ci": [
-        3.01,
-        3.12
+        3.03,
+        3.15
       ]
     }
   ]
